@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { StyleSheet, WebView, Text, View } from 'react-native';
 import CustomStatusBar from './components/CustomStatusBar'
 import URLBar from './components/URLBar'
-import * as api from './network/ml-api'
+import * as api from 'ml-api'
 import FilterWebView from './components/FilterWebView'
 
 export default class App extends Component {
@@ -36,10 +36,8 @@ export default class App extends Component {
                 />
                 <FilterWebView
                     source={{uri: this.state.url}}
-                    // injectedJavaScript={injectedFunction}
                     javaScriptEnabledAndroid={true}
                     onNavigationStateChange={this.navChangeHandler}
-                    // onMessage={this.onWindowMessage}
                 />
             </View>
         );
