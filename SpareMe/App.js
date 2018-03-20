@@ -19,6 +19,10 @@ export default class App extends Component {
         this.setState({url: webState.url});
     }
 
+    refresh = () => {
+        this.refs.web.reload();
+    }
+
     render() {
         let jsCode = `
         var paragraphs = document.getElementsByTagName('p');
@@ -34,17 +38,18 @@ export default class App extends Component {
             <View style={styles.container}>
                 <CustomStatusBar/>
                 <URLBar
+                    refreshHandler={this.refresh}
                     onChangeHandler={this.textChangeHandler}
                     url={this.state.url}
                     onRef={ref => (this.urlBar = ref)}
                 />
                 <WebView
+                    ref='web'
                     source={{uri: this.state.url}}
                     injectedJavaScript={jsCode}
                     style={styles.web}
                     javaScriptEnabledAndroid={true}
                     onNavigationStateChange={this.navChangeHandler}
-                    // onMessage={(event)=> console.log(event.nativeEvent.data)}
                 />
             </View>
         );

@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, Image, TextInput, TouchableOpacity, View } from 'react-native';
 
 class URLBar extends Component {
 
@@ -45,9 +45,17 @@ class URLBar extends Component {
     }
 
     render() {
-        const {onChangeHandler, url} = this.props;
+        const {refreshHandler, onChangeHandler, url} = this.props;
         return (
             <View style={styles.bar}>
+                <TouchableOpacity
+                    style={styles.refresh}
+                    onPress={ () => {
+                            refreshHandler();
+                    }
+                }>
+                    <Image source={require('./refresh.png')} style={styles.image}/>
+                </TouchableOpacity>
                 <TextInput
                     ref='textInput'
                     style={styles.url}
@@ -81,16 +89,30 @@ class URLBar extends Component {
 
 const styles = StyleSheet.create({
     bar: {
+        flexDirection: 'row',
         padding: 10,
         backgroundColor: '#6adbb5',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between'
+    },
+    refresh: {
+        height: 30,
+        width: 30,
+        marginRight: 10,
+        backgroundColor: '#6adbb5',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    image: {
+        height: 25,
+        aspectRatio: 1,
+        resizeMode: 'contain'
     },
     url: {
         height: 30,
+        flex: 1,
         paddingHorizontal: 10,
         paddingVertical: 5,
-        alignSelf: 'stretch',
         backgroundColor: '#fffcf9',
         alignItems: 'center',
         justifyContent: 'center',
