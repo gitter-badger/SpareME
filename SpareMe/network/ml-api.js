@@ -5,19 +5,21 @@ const PREDICT = "predict?text=";
 
 /**
  * Returns the String category for the passed-in tokens from the API.
- * Can be called with any number of arguments.
+ *
+ * @param stringArray an array of Strings to send to the API for evaluation.
  */
-export function getCategoryForWords() {
+export function getCategoryForWords(stringArray) {
     let url = BASE_URL + PREDICT;
 
-    for (let argument of arguments) {
-        url += (argument + '%');
-    }
+    stringArray.forEach(function(element) {
+        url += (element + '%');
+    })
 
     fetch(url).then(function(response) {
         return response._bodyText;
     });
 }
+
 /**
  * Returns the String category for an element's inner (plain) text.
  * Note: for more accurate results, try to use the most deeply-nested
@@ -36,6 +38,7 @@ export function getCategoryForHtmlElement(element) {
 
     return DEFAULT_CATEGORY;
 }
+
 
 export function addTextToCategory(text, category) {
     let url = BASE_URL + ADD;
