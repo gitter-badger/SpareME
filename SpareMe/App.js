@@ -9,7 +9,11 @@ import FilterWebView from './components/FilterWebView'
 export default class App extends Component {
     constructor(props) {
         super(props);
+<<<<<<< HEAD
         this.state = {url: 'https://google.com/'};
+=======
+        this.state = {url: 'https://www.google.com/'};
+>>>>>>> Fix refresh button based on recent merge
     }
 
     textChangeHandler = (text) => {
@@ -36,6 +40,7 @@ export default class App extends Component {
         this.webView.refresh();
     }
 
+<<<<<<< HEAD
     webErrorHandler = (e) => {
         console.log(e.nativeEvent.code);
         const text = 'https://www.google.com/search?q=' + this.state.url.replace('https://', 'http://').replace('http://', '');
@@ -55,6 +60,8 @@ export default class App extends Component {
         );
     }
 
+=======
+>>>>>>> Fix refresh button based on recent merge
     render() {
         return (
             <View style={styles.container}>
@@ -71,8 +78,11 @@ export default class App extends Component {
                     source={{uri: this.state.url}}
                     javaScriptEnabledAndroid={true}
                     onNavigationStateChange={this.navChangeHandler}
+<<<<<<< HEAD
                     onError={this.webErrorHandler}
                     renderError={this.renderError}
+=======
+>>>>>>> Fix refresh button based on recent merge
                     onRef={ref => (this.webView = ref)}
                 />
             </View>
