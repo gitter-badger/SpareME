@@ -34,6 +34,14 @@ export default class FilterWebView extends React.Component {
         this.postMessage = this.postMessage.bind(this);
     }
 
+    componentDidMount() {
+        this.props.onRef(this)
+    }
+
+    componentWillUnmount() {
+        this.props.onRef(undefined)
+    }
+
     /**
      * Sends a message from React Native to the WebView
      */
@@ -48,14 +56,15 @@ export default class FilterWebView extends React.Component {
         console.log(api.getCategoryForHtmlElement(data))
     }
 
-    refresh = () => {
-        this.refs.web.reload();
+    refresh() {
+        this.refs.webView.reload();
     }
-    
+
     render() {
         return (
             <WebView
                 {...this.props}
+                ref='webView'
                 injectedJavaScript={injectedFunction}
                 style = {styles.web}
                 onMessage={e => this.onMessage(e.nativeEvent.data)}

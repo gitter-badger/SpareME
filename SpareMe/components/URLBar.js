@@ -6,7 +6,6 @@ class URLBar extends Component {
 
     constructor(props) {
         super(props);
-        this.typing = false;
         this.state = {url: props.url};
     }
 
@@ -18,29 +17,24 @@ class URLBar extends Component {
         this.props.onRef(undefined)
     }
 
-    blur() {
-        this.typing = false;
+    update(url) {
         this.refs.textInput.blur();
+        this.setState({url: url});
     }
 
     formattedURL() {
         let text = this.state.url.toLowerCase();
-        const domainExts = ['com', 'org', 'edu'];
-
         if (text.includes(' ')) {
             return 'https://www.google.com/search?q=' + text.replace(' ', '+');
         }
-        else {
-            var i;
-            for (var i = 0; i < domainExts.length; ++i) {
-                if (text.includes('.' + domainExts[i])) {
-                    if (!text.startsWith('https://')) {
-                        text = 'https://' + text;
-                    }
-                    return text;
-                }
-            }
+        else if (!text.includes('.')) {
             return 'https://www.google.com/search?q=' + text;
+        }
+        else {
+            if (!text.startsWith('https://') && !text.startsWith('http://')) {
+                text = 'http://' + text;
+            }
+            return text;
         }
     }
 
@@ -51,7 +45,7 @@ class URLBar extends Component {
                 <TouchableOpacity
                     style={styles.refresh}
                     onPress={ () => {
-                            refreshHandler();
+                        refreshHandler();
                     }
                 }>
                     <Image source={require('./refresh.png')} style={styles.image}/>
@@ -60,22 +54,15 @@ class URLBar extends Component {
                     ref='textInput'
                     style={styles.url}
                     selectTextOnFocus={true}
-                    onFocus={ (event) => {
-                        this.typing = true;
-                    }}
-                    onBlur={ () => {
-                        this.typing = false;
-                    }}
                     onChangeText={ (text) => {
                         this.setState({
                             url: text
                         });
                     }}
                     onSubmitEditing={ () => {
-                        this.typing = false;
                         onChangeHandler(this.formattedURL());
                     }}
-                    value={this.typing ? this.state.url : url}
+                    value={this.state.url}
                     editable={true}
                     autoCorrect={false}
                     autoCapitalize={'none'}
