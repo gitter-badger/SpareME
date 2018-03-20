@@ -3,11 +3,13 @@ import React, { Component } from 'react';
 import { StyleSheet, WebView, Text, View } from 'react-native';
 import CustomStatusBar from './components/CustomStatusBar'
 import URLBar from './components/URLBar'
+import * as api from 'ml-api'
+import FilterWebView from './components/FilterWebView'
 
 export default class App extends Component {
     constructor(props) {
         super(props);
-        this.state = {url: 'https://facebook.github.io/react-native/docs/getting-started.html'};
+        this.state = {url: 'https://www.lipsum.com/'};
     }
 
     textChangeHandler = (text) => {
@@ -19,21 +21,11 @@ export default class App extends Component {
         this.setState({url: webState.url});
     }
 
-    refresh = () => {
-        this.refs.web.reload();
+    onWindowMessage(data) {
+        console.log(data);
     }
 
     render() {
-        let jsCode = `
-        var paragraphs = document.getElementsByTagName('p');
-        for(var i = 0; i < paragraphs.length; i++)
-        {
-          paragraphs[i].onclick = function () {
-              	this.style.color = 'transparent'
-                this.style.textShadow = '0 0 5px rgba(0,0,0,0.5)'
-          }
-        }
-        `;
         return (
             <View style={styles.container}>
                 <CustomStatusBar/>
@@ -43,11 +35,9 @@ export default class App extends Component {
                     url={this.state.url}
                     onRef={ref => (this.urlBar = ref)}
                 />
-                <WebView
+                <FilterWebView
                     ref='web'
                     source={{uri: this.state.url}}
-                    injectedJavaScript={jsCode}
-                    style={styles.web}
                     javaScriptEnabledAndroid={true}
                     onNavigationStateChange={this.navChangeHandler}
                 />
@@ -57,11 +47,7 @@ export default class App extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-},
-web: {
-  flex: 1,
-  backgroundColor: '#fff'
-}
+    container: {
+        flex: 1
+    }
 });
