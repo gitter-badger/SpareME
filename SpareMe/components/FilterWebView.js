@@ -7,6 +7,9 @@ import * as api from 'ml-api'
  * Self-executing function to inject into the WebView
  */
 const injectedFunction = `(${String(function() {
+    const INJECTED_CLASSNAME = "SpareMeElement";
+    var injectedClassCounter = 0;
+
     // Steal back any site's postMessage overrides 😏
     var originalPostMessage = window.postMessage;
     var patchedPostMessage = function(message, targetOrigin, transfer) {
@@ -21,9 +24,15 @@ const injectedFunction = `(${String(function() {
     var paragraphs = document.getElementsByTagName('p');
     for (var i = 0; i < paragraphs.length; i++) {
         paragraphs[i].onclick = function () {
+            // Add class so we can find this element later
+            let addedClass = INJECTED_CLASSNAME + injectedClassCounter;
+            injectedClassCounter += 1;
+            this.classList.add(addedClass);
+
             window.postMessage(JSON.stringify({
                 messageType: 'predict',
-                content : String(this.innerText)
+                content : String(this.innerText),
+                addedClass: addedClass
             }));
 
             this.style.color = 'transparent';
@@ -58,23 +67,25 @@ export default class FilterWebView extends React.Component {
      */
     onMessage(data) {
         let messageType = data['messageType'];
+        console.log("got message");
 
         switch(messageType) {
             case 'predict':
+                console.log(data['addedClass']);
 
-                // this will be undefined. but once the API returns .then() in
-                // getCategoryForString(), the value will be present but no
-                // way to put anything into this varaible unless we use a
-                // callback OR a store.
-                console.log(api.getCategoryForString(data['content'], this.apiCallback));
+
+                api.getCategoryForString(data['content'],
+                    this.apiCallback);
                 break;
 
             default:
+                /* Message contains either no known messageType or the message
+                is not a JSON object. */
         }
     }
 
-    apiCallback(val) {
-        console.log(val);
+    apiCallback(category) {
+        console.log(category);
     }
 
     refresh() {
@@ -97,7 +108,6 @@ export default class FilterWebView extends React.Component {
                 injectedJavaScript={injectedFunction}
                 style = {styles.web}
                 onMessage={e => this.onMessage(JSON.parse(e.nativeEvent.data))}
-                // onMessage={e => this.onMessage(e.nativeEvent.data)}
             />
         )
     }
