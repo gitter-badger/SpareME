@@ -49,7 +49,6 @@ export function getCategoryForHtmlElement(element, callback) {
     }
 }
 
-
 export function addTextToCategory(text, category) {
     let url = BASE_URL + ADD;
 

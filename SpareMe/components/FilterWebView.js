@@ -2,6 +2,7 @@
 import React from 'react';
 import { StyleSheet, WebView } from 'react-native';
 import * as api from 'ml-api'
+import * as constants from 'constants'
 
 /**
  * Self-executing function to inject into the WebView
@@ -80,11 +81,10 @@ export default class FilterWebView extends React.Component {
         let innerText = data['content'];
 
         switch(messageType) {
-            
             case 'predict':
                 api.getCategoryForString(innerText,
                     (category) => {
-                        if (category === 'hateful') { // TODO use a constants class
+                        if (category === constants.HATEFUL) {
                             console.log('hiding: ' + innerText);
                             this.postMessage({
                                 name: 'hide',
