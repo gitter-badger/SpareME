@@ -10,6 +10,25 @@ const injectedFunction = `(${String(function() {
     const INJECTED_CLASSNAME = "SpareMeElement";
     var injectedClassCounter = 0;
 
+    // Handle messages from React
+    document.addEventListener("message", function(data) {
+        console.log(data);
+        let action = JSON.parse(data.data);
+        console.log(action);
+        let name = action['name'];
+        console.log(name)
+        let className = action['className'];
+        console.log(className)
+
+        if (name === 'hide') {
+            let elementToHide = document.getElementsByClassName(className)[0];
+            elementToHide.style.color = 'transparent';
+            elementToHide.style.textShadow = '0 0 5px rgba(0,0,0,0.5)';
+        } else {
+            console.log("not hateful!!");
+        }
+    });
+
     // Steal back any site's postMessage overrides 😏
     var originalPostMessage = window.postMessage;
     var patchedPostMessage = function(message, targetOrigin, transfer) {
@@ -24,7 +43,7 @@ const injectedFunction = `(${String(function() {
     var paragraphs = document.getElementsByTagName('p');
     for (var i = 0; i < paragraphs.length; i++) {
         paragraphs[i].onclick = function () {
-            // Add class so we can find this element later
+            // Add unique class so we can find this element later
             let addedClass = INJECTED_CLASSNAME + injectedClassCounter;
             injectedClassCounter += 1;
             this.classList.add(addedClass);
@@ -35,8 +54,8 @@ const injectedFunction = `(${String(function() {
                 addedClass: addedClass
             }));
 
-            this.style.color = 'transparent';
-            this.style.textShadow = '0 0 5px rgba(0,0,0,0.5)';
+            // this.style.color = 'transparent';
+            // this.style.textShadow = '0 0 5px rgba(0,0,0,0.5)';
         }
     }
 })})();`
@@ -59,7 +78,7 @@ export default class FilterWebView extends React.Component {
      * Sends a message from React Native to the WebView
      */
     postMessage(action) {
-        this.WebView.postMessage(JSON.stringify(action));
+        this.refs.webView.postMessage(JSON.stringify(action));
     }
 
     /**
@@ -67,15 +86,21 @@ export default class FilterWebView extends React.Component {
      */
     onMessage(data) {
         let messageType = data['messageType'];
-        console.log("got message");
+        let addedClass = data['addedClass'];
 
         switch(messageType) {
             case 'predict':
-                console.log(data['addedClass']);
-
-
                 api.getCategoryForString(data['content'],
-                    this.apiCallback);
+                    (category) => {
+                        if (category === 'hateful') { // TODO use a constants class
+                            this.postMessage({
+                                name: 'hide',
+                                className: addedClass
+                            });
+                        } else {
+                            console.log("This text is harmless");
+                        }
+                    })
                 break;
 
             default:
