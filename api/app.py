@@ -71,3 +71,9 @@ def predict():
         return "Error: not enough data to predict"
     # return cats[text_clf.predict([text])[0]]
     return cats[gs_clf.predict([text])[0]]
+
+@app.route('/reset', methods=['GET'])
+def reset():
+    cats = []
+    data = []
+    target = []
