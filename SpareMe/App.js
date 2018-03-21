@@ -19,11 +19,6 @@ export default class App extends Component {
 
     navChangeHandler = (webState) => {
         this.urlBar.update(webState.url);
-        this.urlBar.blur();
-
-        if (!webState.url.includes(constants.INJECTED_CLASSNAME)) {
-            this.setState({url: webState.url});
-        }
     }
 
     onWindowMessage(data) {
