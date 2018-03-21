@@ -21,7 +21,11 @@ const injectedFunction = `(${String(function() {
     var paragraphs = document.getElementsByTagName('p');
     for (var i = 0; i < paragraphs.length; i++) {
         paragraphs[i].onclick = function () {
-            window.postMessage(this);
+            window.postMessage(JSON.stringify({
+                messageType: 'predict',
+                content : String(this.innerText)
+            }));
+
             this.style.color = 'transparent';
             this.style.textShadow = '0 0 5px rgba(0,0,0,0.5)';
         }
@@ -53,7 +57,24 @@ export default class FilterWebView extends React.Component {
      * Handles data passed from the webpage back to this WebView
      */
     onMessage(data) {
-        console.log(api.getCategoryForHtmlElement(data))
+        let messageType = data['messageType'];
+
+        switch(messageType) {
+            case 'predict':
+
+                // this will be undefined. but once the API returns .then() in
+                // getCategoryForString(), the value will be present but no
+                // way to put anything into this varaible unless we use a
+                // callback OR a store.
+                console.log(api.getCategoryForString(data['content'], this.apiCallback));
+                break;
+
+            default:
+        }
+    }
+
+    apiCallback(val) {
+        console.log(val);
     }
 
     refresh() {
@@ -75,7 +96,8 @@ export default class FilterWebView extends React.Component {
                 ref='webView'
                 injectedJavaScript={injectedFunction}
                 style = {styles.web}
-                onMessage={e => this.onMessage(e.nativeEvent.data)}
+                onMessage={e => this.onMessage(JSON.parse(e.nativeEvent.data))}
+                // onMessage={e => this.onMessage(e.nativeEvent.data)}
             />
         )
     }

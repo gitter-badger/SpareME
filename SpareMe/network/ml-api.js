@@ -24,6 +24,14 @@ export function getCategoryForWords(stringArray) {
     });
 }
 
+export function getCategoryForString(str, callback) {
+    let url = BASE_URL + PREDICT + str.split(' ').join('%');
+
+    fetch(url).then(function(response) {
+        callback(response._bodyText);
+    });
+}
+
 /**
  * Returns the String category for an element's inner (plain) text.
  * Note: for more accurate results, try to use the most deeply-nested
