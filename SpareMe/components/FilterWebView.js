@@ -12,20 +12,14 @@ const injectedFunction = `(${String(function() {
 
     // Handle messages from React
     document.addEventListener("message", function(data) {
-        console.log(data);
         let action = JSON.parse(data.data);
-        console.log(action);
         let name = action['name'];
-        console.log(name)
         let className = action['className'];
-        console.log(className)
 
         if (name === 'hide') {
             let elementToHide = document.getElementsByClassName(className)[0];
             elementToHide.style.color = 'transparent';
             elementToHide.style.textShadow = '0 0 5px rgba(0,0,0,0.5)';
-        } else {
-            console.log("not hateful!!");
         }
     });
 
@@ -42,23 +36,19 @@ const injectedFunction = `(${String(function() {
     // Blur <p> pags and notify React Native onClick
     var paragraphs = document.getElementsByTagName('p');
     for (var i = 0; i < paragraphs.length; i++) {
-        paragraphs[i].onclick = function () {
             // Add unique class so we can find this element later
             let addedClass = INJECTED_CLASSNAME + injectedClassCounter;
             injectedClassCounter += 1;
-            this.classList.add(addedClass);
+            paragraphs[i].classList.add(addedClass);
 
+            // Send innerText to React
             window.postMessage(JSON.stringify({
                 messageType: 'predict',
-                content : String(this.innerText),
+                content : String(paragraphs[i].innerText),
                 addedClass: addedClass
             }));
-
-            // this.style.color = 'transparent';
-            // this.style.textShadow = '0 0 5px rgba(0,0,0,0.5)';
-        }
     }
-})})();`
+})})();` // JavaScript :)
 
 export default class FilterWebView extends React.Component {
     constructor(props) {
@@ -82,23 +72,26 @@ export default class FilterWebView extends React.Component {
     }
 
     /**
-     * Handles data passed from the webpage back to this WebView
+     * Handles data passed from the WebView to React
      */
     onMessage(data) {
         let messageType = data['messageType'];
         let addedClass = data['addedClass'];
+        let innerText = data['content'];
 
         switch(messageType) {
+            
             case 'predict':
-                api.getCategoryForString(data['content'],
+                api.getCategoryForString(innerText,
                     (category) => {
                         if (category === 'hateful') { // TODO use a constants class
+                            console.log('hiding: ' + innerText);
                             this.postMessage({
                                 name: 'hide',
                                 className: addedClass
                             });
                         } else {
-                            console.log("This text is harmless");
+                            console.log(innerText + ' is harmless');
                         }
                     })
                 break;
