@@ -24,25 +24,30 @@ export function getCategoryForWords(stringArray) {
     });
 }
 
+export function getCategoryForString(str, callback) {
+    let url = BASE_URL + PREDICT + str.split(' ').join('%');
+
+    fetch(url).then(function(response) {
+        callback(response._bodyText);
+    });
+}
+
 /**
  * Returns the String category for an element's inner (plain) text.
  * Note: for more accurate results, try to use the most deeply-nested
  * element possible (don't call this with `HTML` or `body`).
  */
-export function getCategoryForHtmlElement(element) {
+export function getCategoryForHtmlElement(element, callback) {
     let phrase = element.innerText;
 
     if (phrase) {
         let url = BASE_URL + PREDICT + phrase.split(' ').join('%');
 
         fetch(url).then(function(response) {
-            return response._bodyText;
+            callback(response._bodyText);
         });
     }
-
-    return DEFAULT_CATEGORY;
 }
-
 
 export function addTextToCategory(text, category) {
     let url = BASE_URL + ADD;
@@ -60,6 +65,6 @@ export function addTextToCategory(text, category) {
     }
 
     fetch(url, requestData).then(function(response) {
-        return response._bodyText;
+        callback(response._bodyText);
     });
 }

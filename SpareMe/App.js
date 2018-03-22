@@ -4,12 +4,13 @@ import { StyleSheet, WebView, Text, ActivityIndicator, View } from 'react-native
 import CustomStatusBar from './components/CustomStatusBar'
 import URLBar from './components/URLBar'
 import * as api from 'ml-api'
+import * as constants from 'constants'
 import FilterWebView from './components/FilterWebView'
 
 export default class App extends Component {
     constructor(props) {
         super(props);
-        this.state = {url: 'https://google.com/'};
+        this.state = {url: 'https://www.google.com/'};
     }
 
     textChangeHandler = (text) => {

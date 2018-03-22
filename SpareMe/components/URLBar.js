@@ -1,6 +1,7 @@
 'use strict';
 import React, { Component } from 'react';
 import { StyleSheet, Image, TextInput, TouchableOpacity, View } from 'react-native';
+import * as constants from 'constants';
 
 class URLBar extends Component {
 
@@ -22,6 +23,11 @@ class URLBar extends Component {
     }
 
     update(webState) {
+        // Don't update state when the window sends a message to React
+        if (webState.url.includes(constants.POST_MESSAGE)) {
+            return;
+        }
+
         this.refs.textInput.blur();
         this.setState({
             url: webState.url,
