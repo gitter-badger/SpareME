@@ -9,6 +9,7 @@ import * as constants from 'constants'
  */
 const injectedFunction = `(${String(function() {
     const INJECTED_CLASSNAME = "SpareMeElement";
+    const HTML_TEXT_ELEMENTS  = ['p', 'a', 'li'];
     var injectedClassCounter = 0;
 
     // Handle messages from React
@@ -35,8 +36,9 @@ const injectedFunction = `(${String(function() {
     window.postMessage = patchedPostMessage;
 
     // Blur <p> pags and notify React Native onClick
-    var paragraphs = document.getElementsByTagName('p');
-    for (var i = 0; i < paragraphs.length; i++) {
+    for (let htmlElementName of HTML_TEXT_ELEMENTS) {
+        var paragraphs = document.getElementsByTagName(htmlElementName);
+        for (var i = 0; i < paragraphs.length; i++) {
             // Add unique class so we can find this element later
             let addedClass = INJECTED_CLASSNAME + injectedClassCounter;
             injectedClassCounter += 1;
@@ -48,6 +50,7 @@ const injectedFunction = `(${String(function() {
                 content : String(paragraphs[i].innerText),
                 addedClass: addedClass
             }));
+        }
     }
 })})();` // JavaScript :)
 
