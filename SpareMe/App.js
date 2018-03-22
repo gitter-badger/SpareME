@@ -18,7 +18,7 @@ export default class App extends Component {
     }
 
     navChangeHandler = (webState) => {
-        this.urlBar.update(webState.url);
+        this.urlBar.update(webState);
     }
 
     onWindowMessage(data) {

@@ -94,7 +94,7 @@ export default class FilterWebView extends React.Component {
                                 className: addedClass
                             });
                         } else {
-                            console.log(innerText + ' is harmless');
+                            console.log(innerText + ' is in category: ' + category);
                         }
                     })
                 break;
