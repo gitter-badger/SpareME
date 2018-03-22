@@ -17,11 +17,19 @@ export default class App extends Component {
     }
 
     navChangeHandler = (webState) => {
-        this.urlBar.update(webState.url);
+        this.urlBar.update(webState);
     }
 
     onWindowMessage(data) {
         console.log(data);
+    }
+
+    backHandler = () => {
+        this.webView.goBack();
+    }
+
+    forwardHandler = () => {
+        this.webView.goForward();
     }
 
     refresh = () => {
@@ -52,6 +60,8 @@ export default class App extends Component {
             <View style={styles.container}>
                 <CustomStatusBar/>
                 <URLBar
+                    backHandler={this.backHandler}
+                    forwardHandler={this.forwardHandler}
                     refreshHandler={this.refresh}
                     onChangeHandler={this.textChangeHandler}
                     url={this.state.url}
