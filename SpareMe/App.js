@@ -39,7 +39,7 @@ export default class App extends Component {
 
     webErrorHandler = (e) => {
         console.log(e.nativeEvent.code);
-        const text = 'https://www.google.com/search?q=' + this.state.url.replace('https://', 'http://').replace('http://', '');
+        const text = constants.GOOGLE_SEARCH + this.state.url.replace('https://', 'http://').replace('http://', '');
         this.setState({url: text});
     }
 

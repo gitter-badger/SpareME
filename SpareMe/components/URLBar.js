@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
-import { StyleSheet, Image, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Image, TextInput, TouchableOpacity, Platform, View } from 'react-native';
 import * as constants from 'constants';
 
 class URLBar extends Component {
@@ -39,10 +39,10 @@ class URLBar extends Component {
     formattedURL() {
         let text = this.state.url.toLowerCase();
         if (text.includes(' ')) {
-            return 'https://www.google.com/search?q=' + text.replace(' ', '+');
+            return constants.GOOGLE_SEARCH + text.replace(' ', '+');
         }
         else if (!text.includes('.')) {
-            return 'https://www.google.com/search?q=' + text;
+            return constants.GOOGLE_SEARCH + text;
         }
         else {
             if (!text.startsWith('https://') && !text.startsWith('http://')) {
@@ -89,9 +89,10 @@ class URLBar extends Component {
                     value={this.state.url}
                     editable={true}
                     autoCorrect={false}
-                    autoCapitalize={'none'}
-                    returnKeyType={'go'}
+                    autoCapitalize='none'
+                    returnKeyType='go'
                     underlineColorAndroid='transparent'
+                    keyboardType={Platform.OS === 'ios' ? 'web-search' : 'default'}
                 />
                 <TouchableOpacity
                     style={styles.barButton}
@@ -116,19 +117,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingHorizontal: 5,
         paddingVertical: 10,
-        backgroundColor: '#6adbb5',
+        backgroundColor: constants.COLOR_MAIN,
         alignItems: 'center',
         justifyContent: 'space-between'
     },
     barButton: {
         height: 30,
         width: 30,
-        backgroundColor: '#6adbb5',
+        backgroundColor: constants.COLOR_MAIN,
         alignItems: 'center',
         justifyContent: 'center'
     },
     disabled: {
-        tintColor: '#e0e0e0'
+        tintColor: constants.COLOR_DISABLED
     },
     refresh: {
         height: 25,
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 5,
         marginHorizontal: 5,
-        backgroundColor: '#fffcf9',
+        backgroundColor: constants.COLOR_WHITE,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,
