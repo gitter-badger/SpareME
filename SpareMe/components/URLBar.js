@@ -6,7 +6,11 @@ class URLBar extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {url: props.url};
+        this.state = {
+            url: props.url,
+            canGoBack: false,
+            canGoForward: false
+        };
     }
 
     componentDidMount() {
@@ -17,9 +21,13 @@ class URLBar extends Component {
         this.props.onRef(undefined)
     }
 
-    update(url) {
+    update(webState) {
         this.refs.textInput.blur();
-        this.setState({url: url});
+        this.setState({
+            url: webState.url,
+            canGoBack: webState.canGoBack,
+            canGoForward: webState.canGoForward
+        });
     }
 
     formattedURL() {
@@ -39,16 +47,26 @@ class URLBar extends Component {
     }
 
     render() {
-        const {refreshHandler, onChangeHandler, url} = this.props;
+        const {backHandler, forwardHandler, refreshHandler, onChangeHandler, url} = this.props;
         return (
             <View style={styles.bar}>
                 <TouchableOpacity
-                    style={styles.refresh}
+                    disabled={!this.state.canGoBack}
+                    style={styles.barButton}
                     onPress={ () => {
-                        refreshHandler();
+                        backHandler();
                     }
                 }>
-                    <Image source={require('./refresh.png')} style={styles.image}/>
+                    <Image source={require('./back.png')} style={[styles.arrow, !this.state.canGoBack ? styles.disabled : null]}/>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    disabled={!this.state.canGoForward}
+                    style={styles.barButton}
+                    onPress={ () => {
+                        forwardHandler();
+                    }
+                }>
+                    <Image source={require('./forward.png')} style={[styles.arrow, !this.state.canGoForward ? styles.disabled : null]}/>
                 </TouchableOpacity>
                 <TextInput
                     ref='textInput'
@@ -69,28 +87,44 @@ class URLBar extends Component {
                     returnKeyType={'go'}
                     underlineColorAndroid='transparent'
                 />
+                <TouchableOpacity
+                    style={styles.barButton}
+                    onPress={ () => {
+                        refreshHandler();
+                    }
+                }>
+                    <Image source={require('./refresh.png')} style={styles.refresh}/>
+                </TouchableOpacity>
             </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
+    arrow: {
+        height: 30,
+        aspectRatio: 1,
+        resizeMode: 'contain'
+    },
     bar: {
         flexDirection: 'row',
-        padding: 10,
+        paddingHorizontal: 5,
+        paddingVertical: 10,
         backgroundColor: '#6adbb5',
         alignItems: 'center',
         justifyContent: 'space-between'
     },
-    refresh: {
+    barButton: {
         height: 30,
         width: 30,
-        marginRight: 10,
         backgroundColor: '#6adbb5',
         alignItems: 'center',
         justifyContent: 'center'
     },
-    image: {
+    disabled: {
+        tintColor: '#e0e0e0'
+    },
+    refresh: {
         height: 25,
         aspectRatio: 1,
         resizeMode: 'contain'
@@ -100,6 +134,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 10,
         paddingVertical: 5,
+        marginHorizontal: 5,
         backgroundColor: '#fffcf9',
         alignItems: 'center',
         justifyContent: 'center',

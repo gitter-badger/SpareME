@@ -60,6 +60,14 @@ export default class FilterWebView extends React.Component {
         this.refs.webView.reload();
     }
 
+    goBack() {
+        this.refs.webView.goBack();
+    }
+
+    goForward() {
+        this.refs.webView.goForward();
+    }
+
     render() {
         return (
             <WebView
