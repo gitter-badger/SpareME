@@ -9,7 +9,7 @@ import * as constants from 'constants'
  */
 const injectedFunction = `(${String(function() {
     const INJECTED_CLASSNAME = "SpareMeElement";
-    const HTML_TEXT_ELEMENTS  = ['p', 'a', 'li'];
+    const HTML_TEXT_ELEMENTS  = ['p', 'a', 'li', 'img'];
     var injectedClassCounter = 0;
 
     // Handle messages from React
@@ -20,6 +20,7 @@ const injectedFunction = `(${String(function() {
 
         if (name === 'hide') {
             let elementToHide = document.getElementsByClassName(className)[0];
+            elementToHide.style.filter = 'blur(10px)';
             elementToHide.style.color = 'transparent';
             elementToHide.style.textShadow = '0 0 5px rgba(0,0,0,0.5)';
         }
@@ -35,19 +36,19 @@ const injectedFunction = `(${String(function() {
     }
     window.postMessage = patchedPostMessage;
 
-    // Blur <p> pags and notify React Native onClick
+    // Send tags to React
     for (let htmlElementName of HTML_TEXT_ELEMENTS) {
-        var paragraphs = document.getElementsByTagName(htmlElementName);
-        for (var i = 0; i < paragraphs.length; i++) {
+        var elements = document.getElementsByTagName(htmlElementName);
+        for (var i = 0; i < elements.length; i++) {
             // Add unique class so we can find this element later
             let addedClass = INJECTED_CLASSNAME + injectedClassCounter;
             injectedClassCounter += 1;
-            paragraphs[i].classList.add(addedClass);
+            elements[i].classList.add(addedClass);
 
             // Send innerText to React
             window.postMessage(JSON.stringify({
                 messageType: 'predict',
-                content : String(paragraphs[i].innerText),
+                content : String(htmlElementName === 'img' ?  elements[i].alt : elements[i].innerText),
                 addedClass: addedClass
             }));
         }
@@ -103,10 +104,6 @@ export default class FilterWebView extends React.Component {
                 /* Message contains either no known messageType or the message
                 is not a JSON object. */
         }
-    }
-
-    apiCallback(category) {
-        console.log(category);
     }
 
     refresh() {
