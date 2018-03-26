@@ -28,7 +28,7 @@ export function getCategoryForWords(stringArray, idToken) {
 }
 
 export function getCategoryForString(str, idToken, callback) {
-    let url = BASE_URL + PREDICT + str.split(' ').join('%') + ID_TOKEN + idToken;
+    let url = BASE_URL + PREDICT + encodeURIComponent(str) + ID_TOKEN + encodeURIComponent(idToken);
 
     fetch(url).then(function(response) {
         callback(response._bodyText);
@@ -44,9 +44,9 @@ export function getCategoryForHtmlElement(element, idToken, callback) {
     let phrase = element.innerText;
 
     if (phrase) {
-        let url = BASE_URL + PREDICT + phrase.split(' ').join('%');
+        let url = BASE_URL + PREDICT + encodeURIComponent(phrase);
 
-        url += ID_TOKEN + idToken;
+        url += ID_TOKEN + encodeURIComponent(idToken);
 
         fetch(url).then(function(response) {
             callback(response._bodyText);
@@ -58,9 +58,9 @@ export function addTextToCategory(text, category, idToken) {
     let url = BASE_URL + ADD;
 
     var form = new FormData();
-    form.append('text', text);
-    form.append('category', category);
-    form.appent('id_token', idToken);
+    form.append('text', encodeURIComponent(text));
+    form.append('category', encodeURIComponent(category));
+    form.appent('id_token', encodeURIComponent(idToken));
 
     let requestData = {
         method: 'POST',
