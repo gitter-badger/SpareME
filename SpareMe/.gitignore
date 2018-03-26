@@ -20,7 +20,9 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-project.xcworkspace
+*.xcworkspace
+Podfile.lock
+Pods/
 
 # Android/IntelliJ
 #
@@ -55,5 +57,5 @@ buck-out/
 # Bundle artifact
 *.jsbundle
 
-# Expo 
+# Expo
 .expo/

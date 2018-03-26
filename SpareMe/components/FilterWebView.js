@@ -36,7 +36,7 @@ export default class FilterWebView extends React.Component {
 
         switch(messageType) {
             case 'predict':
-                api.getCategoryForString(innerText,
+                api.getCategoryForString(innerText, this.props.idToken,
                     (category) => {
                         if (category === constants.HATEFUL) {
                             console.log('hiding: ' + innerText);
