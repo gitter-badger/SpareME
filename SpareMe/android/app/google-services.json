@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "693634544798",
+    "firebase_url": "https://spareme-firebase.firebaseio.com",
+    "project_id": "spareme-firebase",
+    "storage_bucket": "spareme-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:693634544798:android:a709a42751655428",
+        "android_client_info": {
+          "package_name": "com.spareme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "693634544798-4e5a62t6g7ikhmsl617dmlvbjn5l950m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.spareme",
+            "certificate_hash": "49cdfdd44cb32284feb6b7504e2ff012f9b09e4e"
+          }
+        },
+        {
+          "client_id": "693634544798-1ss8u5gvscaoiji8rqmfbij2dlucmdti.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWzR1J1YICwfTFdSSKkAfY94mG6IBQrdE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "693634544798-1ss8u5gvscaoiji8rqmfbij2dlucmdti.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

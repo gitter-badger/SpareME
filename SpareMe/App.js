@@ -7,11 +7,54 @@ import * as api from 'ml-api'
 import * as constants from 'constants'
 import FilterWebView from './components/FilterWebView'
 import { StackNavigator } from 'react-navigation'
+import firebase from 'react-native-firebase';
+
+// Components to show on login/logout
+// import LoggedIn from './LoggedIn';
+// import LoggedOut from './LoggedOut';
 
 class HomeScreen extends Component {
     constructor(props) {
         super(props);
-        this.state = {url: 'https://www.google.com/'};
+        this.state = {
+            url: 'https://www.google.com/',
+            loading: true,
+        };
+    }
+
+    /**
+    * When the App component mounts, we listen for any authentication
+    * state changes in Firebase.
+    * Once subscribed, the 'user' parameter will either be null
+    * (logged out) or an Object (logged in)
+    */
+    componentDidMount() {
+        var self = this;
+        this.authSubscription = firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                console.log(user.email + ' user authenticated');
+                user.getIdToken(/* forceRefresh */ true)
+                .then(function(result) {
+                    console.log('got idToken: ' + result);
+                    self.setState({idToken: result});
+                })
+                .catch(function(error) {
+                    console.log('authentication error: ' + error);
+                });
+            }
+            self.setState({
+                loading: false,
+                user,
+            });
+        });
+    }
+
+    /**
+     * Don't forget to stop listening for authentication state changes
+     * when the component unmounts.
+     */
+    componentWillUnmount() {
+      this.authSubscription();
     }
 
     textChangeHandler = (text) => {
@@ -58,6 +101,13 @@ class HomeScreen extends Component {
     }
 
     render() {
+        // The application is initialising
+        if (this.state.loading) return null;
+        // The user is an Object, so they're logged in
+        // if (this.state.user) return <LoggedIn />;
+        // The user is null, so they're logged out
+        // return <LoggedOut />;
+
         return (
             <View style={styles.container}>
                 <CustomStatusBar/>
@@ -70,6 +120,7 @@ class HomeScreen extends Component {
                     onRef={ref => (this.urlBar = ref)}/>
                 <FilterWebView
                     source={{uri: this.state.url}}
+                    idToken={this.state.idToken}
                     javaScriptEnabledAndroid={true}
                     onNavigationStateChange={this.navChangeHandler}
                     onError={this.webErrorHandler}
@@ -84,6 +135,36 @@ class HomeScreen extends Component {
 }
 
 class SignInScreen extends Component {
+    onLogin = () => {
+        const { email, password } = this.state;
+        firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((user) => {
+            // If you need to do anything with the user, do it here
+            // The user will be logged in automatically by the
+            // `onAuthStateChanged` listener we set up in App.js earlier
+        }).catch((error) => {
+            const { code, message } = error;
+            // For details of error codes, see the docs
+            // The message contains the default Firebase string
+            // representation of the error
+        });
+    }
+
+    onRegister = () => {
+        const { email, password } = this.state;
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((user) => {
+            // If you need to do anything with the user, do it here
+            // The user will be logged in automatically by the
+            // `onAuthStateChanged` listener we set up in App.js earlier
+        }).catch((error) => {
+            const { code, message } = error;
+            // For details of error codes, see the docs
+            // The message contains the default Firebase string
+            // representation of the error
+        });
+    }
+
     render() {
         return (
             <View style={styles.loginView}>
@@ -95,7 +176,12 @@ class SignInScreen extends Component {
                 </Text>
                 <TextInput
                     style= {{width: 150}}
-                    placeholder="Enter Username"
+                    placeholder="Enter Email"
+                    onChangeText={ (text) => {
+                        this.setState({
+                            email: text
+                        });
+                    }}
                 />
                 <Text style={{fontSize: 20}}>
                     Password:
@@ -103,13 +189,18 @@ class SignInScreen extends Component {
                 <TextInput
                     style= {{width: 150}}
                     placeholder="Enter Password"
+                    onChangeText={ (text) => {
+                        this.setState({
+                            password: text
+                        });
+                    }}
                 />
 
                 <View style={styles.buttonContainer}>
                     <View style={styles.button}>
                         <Button
                             title='Sign In'
-                            onPress={() => this.props.navigation.goBack()}
+                            onPress={this.onLogin}
                         />
                     </View>
                     <View style={styles.button}>
@@ -120,9 +211,9 @@ class SignInScreen extends Component {
                         />
                     </View>
                 </View>
-                
+
             </View>
-            
+
         );
     }
 }
