@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
-import { StyleSheet, ActivityIndicator, View, Button } from 'react-native';
+import { StyleSheet, ActivityIndicator, View, Button, NetInfo, Text } from 'react-native';
 import CustomStatusBar from '../components/CustomStatusBar'
 import URLBar from '../components/URLBar'
 import * as api from 'ml-api'
@@ -19,6 +19,10 @@ export default class Home extends Component {
             url: 'https://www.google.com/',
             loading: true,
         };
+        NetInfo.isConnected.fetch().then(isConnected => {
+            console.log(isConnected);
+            this.setState({isConnected: isConnected});
+        });
     }
 
     /**
@@ -28,6 +32,7 @@ export default class Home extends Component {
     * (logged out) or an Object (logged in)
     */
     componentDidMount() {
+        NetInfo.isConnected.addEventListener('connectionChange', this.onConnectivityChange);
         var self = this;
         this.authSubscription = firebase.auth().onAuthStateChanged((user) => {
             if (user) {
@@ -35,7 +40,10 @@ export default class Home extends Component {
                 user.getIdToken(/* forceRefresh */ true)
                 .then(function(result) {
                     console.log('got idToken: ' + result);
-                    self.setState({idToken: result});
+                    self.setState({
+                        idToken: result,
+                        user: user
+                    });
                 })
                 .catch(function(error) {
                     console.log('authentication error: ' + error);
@@ -43,7 +51,7 @@ export default class Home extends Component {
             }
             self.setState({
                 loading: false,
-                user,
+                user: null,
             });
         });
     }
@@ -53,7 +61,12 @@ export default class Home extends Component {
      * when the component unmounts.
      */
     componentWillUnmount() {
-      this.authSubscription();
+        NetInfo.removeEventListener('connectionChange', this.onConnectivityChange);
+        this.authSubscription();
+    }
+
+    onConnectivityChange = isConnected => {
+        this.setState({isConnected: isConnected});
     }
 
     textChangeHandler = (text) => {
@@ -100,8 +113,29 @@ export default class Home extends Component {
     }
 
     render() {
+        if (!this.state.isConnected) {
+            return(
+                <View style={styles.container}>
+                    <CustomStatusBar/>
+                    <View style={styles.connectionContainer}>
+                        <Text style={styles.connectionText}>Unable to connect. Please check your network settings.</Text>
+                    </View>
+                </View>
+            );
+        }
         // The application is initialising
-        if (this.state.loading) return null;
+        if (this.state.loading) {
+            return(
+                <View style={styles.activityView}>
+                    <ActivityIndicator
+                        animating={true}
+                        color='#84888d'
+                        size='large'
+                        hidesWhenStopped={true}
+                    />
+                </View>
+            );
+        }
         // The user is an Object, so they're logged in
         // if (this.state.user) return <LoggedIn />;
         // The user is null, so they're logged out
@@ -141,5 +175,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1
+    },
+    connectionContainer: {
+        flex: 1,
+        backgroundColor: constants.COLOR_MAIN,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 30
+    },
+    connectionText: {
+        color: constants.COLOR_WHITE,
+        fontSize: 24
     }
 });
