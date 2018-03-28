@@ -1,7 +1,8 @@
 version: '3'
 services:
-  web:
-    restart: always
-    build: .
+  flask:
+    build: ./flask
+    image: flask
     ports:
      - "5000:5000"
+    restart: always
