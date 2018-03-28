@@ -31,23 +31,25 @@ export default class FilterWebView extends React.Component {
      */
     onMessage(data) {
         let messageType = data['messageType'];
-        let addedClass = data['addedClass'];
-        let innerText = data['content'];
+        // let addedClass = data['addedClass'];
+        let predictionGroup = data['content'];
+        console.log('got message content: ' + predictionGroup['SpareMeElement1'])
 
         switch(messageType) {
             case 'predict':
-                api.getCategoryForString(innerText, this.props.idToken,
-                    (category) => {
-                        if (category === constants.HATEFUL) {
-                            console.log('hiding: ' + innerText);
-                            this.postMessage({
-                                name: 'hide',
-                                className: addedClass
-                            });
-                        } else {
-                            console.log(innerText + ' is in category: ' + category);
-                        }
-                    })
+                console.log(api.createBatchQuery(predictionGroup, this.props.idToken))
+                // api.getCategoriesForGroup(predictionGroup, this.props.idToken,
+                //     (category) => {
+                //         if (category === constants.HATEFUL) {
+                //             console.log('hiding: ' + innerText);
+                //             this.postMessage({
+                //                 name: 'hide',
+                //                 className: addedClass
+                //             });
+                //         } else {
+                //             console.log(innerText + ' is in category: ' + category);
+                //         }
+                //     })
                 break;
 
             default:
