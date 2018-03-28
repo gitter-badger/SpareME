@@ -67,6 +67,8 @@ export const injectedJS = `(${String(function() {
                     messageType: 'predict',
                     content : predictionGroup
                 }));
+
+                predictionGroup = {}
             }
 
             // Send innerText to React

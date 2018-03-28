@@ -40,21 +40,25 @@ export default class FilterWebView extends React.Component {
                 // console.log(api.createBatchQuery(predictionGroup, this.props.idToken))
                 api.getCategoriesForBatch(predictionBatch, this.props.idToken,
                     (response) => {
-                        let responseJSON = JSON.parse(response)
-                        console.log('got responseJSON: ' + responseJSON);
-                        for (var key in responseJSON) {
-                            if (!responseJSON.hasOwnProperty(key)) continue;
+                        try {
+                            console.log('got response: ' + response);
+                            let responseJSON = JSON.parse(response)
+                            for (var key in responseJSON) {
+                                if (!responseJSON.hasOwnProperty(key)) continue;
 
-                            let category = responseJSON[key];
-                            if (category === constants.HATEFUL) {
-                                console.log('hiding: ' + key);
-                                this.postMessage({
-                                    name: 'hide',
-                                    className: key
-                                });
-                            } else {
-                                console.log(key + ' is in category: ' + category);
+                                let category = responseJSON[key];
+                                if (category === constants.HATEFUL) {
+                                    console.log('hiding: ' + key);
+                                    this.postMessage({
+                                        name: 'hide',
+                                        className: key
+                                    });
+                                } else {
+                                    console.log(key + ' is in category: ' + category);
+                                }
                             }
+                        } catch (error) {
+                            console.log(error)
                         }
                     })
                 break;
