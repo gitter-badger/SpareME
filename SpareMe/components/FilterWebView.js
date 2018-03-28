@@ -31,13 +31,10 @@ export default class FilterWebView extends React.Component {
      */
     onMessage(data) {
         let messageType = data['messageType'];
-        // let addedClass = data['addedClass'];
         let predictionBatch = data['content'];
-        // console.log('got message content: ' + predictionGroup['SpareMeElement1'])
 
         switch(messageType) {
             case 'predict':
-                // console.log(api.createBatchQuery(predictionGroup, this.props.idToken))
                 api.getCategoriesForBatch(predictionBatch, this.props.idToken,
                     (response) => {
                         try {

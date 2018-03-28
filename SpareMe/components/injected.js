@@ -56,12 +56,16 @@ export const injectedJS = `(${String(function() {
         var predictionGroup = {}
         for (var i = 0; i < elements.length; i++) {
             var element = elements[i]
+
             // Add unique class so we can find this element later
             let addedClass = INJECTED_CLASSNAME + injectedClassCounter;
             injectedClassCounter += 1;
             element.classList.add(addedClass);
+
+            // Map the added class name to the element's innerText
             predictionGroup[addedClass] = String(element.tagName === 'img' ? element.alt : element.innerText)
 
+            // Send elements in groups of HTTP_BATCH_SIZE to React
             if (injectedClassCounter % HTTP_BATCH_SIZE == 0 || i == elements.length - 1) {
                 window.postMessage(JSON.stringify({
                     messageType: 'predict',
@@ -70,13 +74,6 @@ export const injectedJS = `(${String(function() {
 
                 predictionGroup = {}
             }
-
-            // Send innerText to React
-            // window.postMessage(JSON.stringify({
-            //     messageType: 'predict',
-            //     content : String(element.tagName === 'img' ? element.alt : element.innerText),
-            //     addedClass: addedClass
-            // }));
         }
     }
 
