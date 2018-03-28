@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Image, TextInput, TouchableOpacity, Platform, View } from 'react-native';
 import * as constants from 'constants';
+import {MenuProvider, Menu, MenuOptions, MenuOption, MenuTrigger} from 'react-native-popup-menu'
 
 class URLBar extends Component {
 
@@ -53,7 +54,7 @@ class URLBar extends Component {
     }
 
     render() {
-        const {backHandler, forwardHandler, refreshHandler, onChangeHandler, url} = this.props;
+        const {backHandler, forwardHandler, refreshHandler, onChangeHandler, menuHandler, url} = this.props;
         return (
             <View style={styles.bar}>
                 <TouchableOpacity
@@ -102,6 +103,18 @@ class URLBar extends Component {
                 }>
                     <Image source={require('./refresh.png')} style={styles.refresh}/>
                 </TouchableOpacity>
+
+                <Menu onSelect = {value => menuHandler(value)}>
+                  <MenuTrigger>
+                    <Image source={require('./menu.png')} style={styles.refresh}/>
+                  </MenuTrigger>
+                  <MenuOptions>
+                      <MenuOption value={1} text='SignIn' />
+                      <MenuOption value={2} text='Flag Content' />
+                      <MenuOption value={3} text='Settings' />
+                  </MenuOptions>
+                </Menu>
+
             </View>
         );
     }

@@ -7,6 +7,7 @@ import * as api from 'ml-api'
 import * as constants from 'constants'
 import FilterWebView from '../components/FilterWebView'
 import firebase from 'react-native-firebase';
+import {MenuProvider} from 'react-native-popup-menu'
 
 // Components to show on login/logout
 // import LoggedIn from './LoggedIn';
@@ -114,6 +115,20 @@ export default class Home extends Component {
         this.setState({url: text});
     }
 
+    menuHandler = (value) => {
+        switch(value) {
+          case 1:
+            this.props.navigation.navigate('SignIn');
+            break;
+          case 2:
+            break;
+          case 3:
+            break;
+          default:
+            break;
+        }
+    }
+
     renderError = () => {
         return(
             <View style={styles.activityView}>
@@ -157,6 +172,7 @@ export default class Home extends Component {
         // return <LoggedOut />;
 
         return (
+          <MenuProvider>
             <View style={styles.container}>
                 <CustomStatusBar/>
                 <URLBar
@@ -164,6 +180,7 @@ export default class Home extends Component {
                     forwardHandler={this.forwardHandler}
                     refreshHandler={this.refresh}
                     onChangeHandler={this.textChangeHandler}
+                    menuHandler={this.menuHandler}
                     url={this.state.url}
                     onRef={ref => (this.urlBar = ref)}/>
                 <FilterWebView
@@ -174,10 +191,8 @@ export default class Home extends Component {
                     onError={this.webErrorHandler}
                     renderError={this.renderError}
                     onRef={ref => (this.webView = ref)}/>
-                <Button
-                    title="Log In"
-                    onPress={() => this.props.navigation.navigate('SignIn')}/>
             </View>
+          </MenuProvider>
         );
     }
 }
