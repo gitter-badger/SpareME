@@ -1,18 +1,26 @@
-FROM debian:8
+FROM continuumio/miniconda3:4.4.10
 
-ADD . /code
-WORKDIR /code
+RUN conda update -n base conda && \
+    conda config --add channels conda-forge && \
+    conda create -y -n flask \
+        python=3 \
+        scikit-learn \
+        flask=0.12 \
+        flask-restful
 
-ENV PATH="/opt/conda/bin:${PATH}"
+# alternative to `source activate flask`
+ENV PATH /opt/conda/envs/flask/bin:$PATH
+
+# can't figure out how to install this into the conda environment
+RUN pip install firebase-admin
+
+# Create a flask user to avoid running flask as root
+RUN useradd -r flask
+COPY . /app
+WORKDIR /app
+RUN chown -R flask /app
+USER flask
+
 ENV FLASK_APP="app.py"
-ENV LC_ALL="C.UTF-8"
-ENV LANG="C.UTF-8"
-
-RUN apt-get update --fix-missing && apt-get install -y wget bzip2
-RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
-    wget --quiet https://repo.continuum.io/archive/Anaconda3-5.1.0-Linux-x86_64.sh -O ~/anaconda.sh && \
-    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
-    rm ~/anaconda.sh
-RUN pip install -r requirements.txt
 
 CMD ["flask", "run", "--host=0.0.0.0"]
