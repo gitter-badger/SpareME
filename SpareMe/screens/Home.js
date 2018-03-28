@@ -66,15 +66,30 @@ export default class Home extends Component {
     }
 
     onConnectivityChange = isConnected => {
-        this.setState({isConnected: isConnected});
+        if (isConnected) {
+            this.setState({isConnected: isConnected});
+        }
     }
 
     textChangeHandler = (text) => {
-        this.setState({url: text});
+        NetInfo.isConnected.fetch().then(isConnected => {
+            this.setState({
+                isConnected: isConnected,
+                url: text
+            });
+        });
     }
 
     navChangeHandler = (webState) => {
         this.urlBar.update(webState);
+        NetInfo.isConnected.fetch().then(isConnected => {
+            if (!isConnected) {
+                this.setState({
+                    isConnected: isConnected,
+                    url: webState.url
+                });
+            }
+        });
     }
 
     onWindowMessage(data) {
