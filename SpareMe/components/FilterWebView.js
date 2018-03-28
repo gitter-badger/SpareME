@@ -32,24 +32,31 @@ export default class FilterWebView extends React.Component {
     onMessage(data) {
         let messageType = data['messageType'];
         // let addedClass = data['addedClass'];
-        let predictionGroup = data['content'];
-        console.log('got message content: ' + predictionGroup['SpareMeElement1'])
+        let predictionBatch = data['content'];
+        // console.log('got message content: ' + predictionGroup['SpareMeElement1'])
 
         switch(messageType) {
             case 'predict':
-                console.log(api.createBatchQuery(predictionGroup, this.props.idToken))
-                // api.getCategoriesForGroup(predictionGroup, this.props.idToken,
-                //     (category) => {
-                //         if (category === constants.HATEFUL) {
-                //             console.log('hiding: ' + innerText);
-                //             this.postMessage({
-                //                 name: 'hide',
-                //                 className: addedClass
-                //             });
-                //         } else {
-                //             console.log(innerText + ' is in category: ' + category);
-                //         }
-                //     })
+                // console.log(api.createBatchQuery(predictionGroup, this.props.idToken))
+                api.getCategoriesForBatch(predictionBatch, this.props.idToken,
+                    (response) => {
+                        let responseJSON = JSON.parse(response)
+                        console.log('got responseJSON: ' + responseJSON);
+                        for (var key in responseJSON) {
+                            if (!responseJSON.hasOwnProperty(key)) continue;
+
+                            let category = responseJSON[key];
+                            if (category === constants.HATEFUL) {
+                                console.log('hiding: ' + key);
+                                this.postMessage({
+                                    name: 'hide',
+                                    className: key
+                                });
+                            } else {
+                                console.log(key + ' is in category: ' + category);
+                            }
+                        }
+                    })
                 break;
 
             default:

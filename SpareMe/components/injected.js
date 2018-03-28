@@ -3,7 +3,7 @@
  */
 export const injectedJS = `(${String(function() {
     const INJECTED_CLASSNAME = "SpareMeElement";
-    const HTTP_BATCH_SIZE = 10
+    const HTTP_BATCH_SIZE = 25
     var injectedClassCounter = 0;
 
     inject();
@@ -62,12 +62,12 @@ export const injectedJS = `(${String(function() {
             element.classList.add(addedClass);
             predictionGroup[addedClass] = String(element.tagName === 'img' ? element.alt : element.innerText)
 
-            // if (i % HTTP_BATCH_SIZE == 0 || i == elements.length - 1) {
+            if (injectedClassCounter % HTTP_BATCH_SIZE == 0 || i == elements.length - 1) {
                 window.postMessage(JSON.stringify({
                     messageType: 'predict',
                     content : predictionGroup
                 }));
-            // }
+            }
 
             // Send innerText to React
             // window.postMessage(JSON.stringify({
