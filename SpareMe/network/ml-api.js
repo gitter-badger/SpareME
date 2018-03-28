@@ -3,7 +3,7 @@
  */
 
 const ADD = "add";
-const BASE_URL = "http://127.0.0.1:5000/";
+const BASE_URL = "http://172.16.106.212:5000/";
 const PREDICT_BATCH = "predictBatch?"
 const DEFAULT_CATEGORY = "harmless";
 const PREDICT = "predict?text=";
@@ -41,9 +41,8 @@ export function getCategoryForString(str, idToken, callback) {
  *
  * @param group a JSON object whose keys are the Strings to analyze
  */
-export function getCategoriesForGroup(group, idToken, callback) {
-
-    fetch(url).then(function(response) {
+export function getCategoriesForBatch(batch, idToken, callback) {
+    fetch(createBatchQuery(batch, idToken)).then(function(response) {
         callback(response._bodyText);
     });
 }
@@ -58,7 +57,9 @@ export function createBatchQuery(batch, idToken) {
         }
     }
 
-    return url + query_args.join("&") + ID_TOKEN + encodeURIComponent(idToken);
+    url += query_args.join("&") + ID_TOKEN + encodeURIComponent(idToken);
+    console.log("fetching batch from: " + url)
+    return url
 }
 
 /**
