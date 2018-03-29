@@ -56,7 +56,6 @@ class URLBar extends Component {
 
     render() {
         const {backHandler, forwardHandler, refreshHandler, onChangeHandler, menuHandler, url} = this.props;
-        if (firebase.auth().currentUser == null) {
           return (
               <View style={styles.bar}>
                   <TouchableOpacity
@@ -112,79 +111,14 @@ class URLBar extends Component {
                       <Image source={require('./menu.png')} style={styles.refresh}/>
                     </MenuTrigger>
                     <MenuOptions>
-                        <MenuOption value={1} text='Sign In' />
-                        <MenuOption value={3} text='Flag Content' />
-                        <MenuOption value={4} text='Settings' />
+                        {firebase.auth().currentUser == null ? <MenuOption value={1} text='Sign In' /> : <MenuOption value={2} text='Sign Out' />}
+                        {firebase.auth().currentUser == null ? <MenuOption value={3} text='Create Account' /> : null}
+                        <MenuOption value={4} text='Flag Content' />
+                        <MenuOption value={5} text='Settings' />
                     </MenuOptions>
                   </Menu>
               </View>
           );
-        } else {
-          return (
-              <View style={styles.bar}>
-                  <TouchableOpacity
-                      disabled={!this.state.canGoBack}
-                      style={styles.barButton}
-                      onPress={ () => {
-                          backHandler();
-                      }
-                  }>
-                      <Image source={require('./back.png')} style={[styles.arrow, !this.state.canGoBack ? styles.disabled : null]}/>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                      disabled={!this.state.canGoForward}
-                      style={styles.barButton}
-                      onPress={ () => {
-                          forwardHandler();
-                      }
-                  }>
-                      <Image source={require('./forward.png')} style={[styles.arrow, !this.state.canGoForward ? styles.disabled : null]}/>
-                  </TouchableOpacity>
-                  <TextInput
-                      ref='textInput'
-                      style={styles.url}
-                      selectTextOnFocus={true}
-                      onChangeText={ (text) => {
-                          this.setState({
-                              url: text
-                          });
-                      }}
-                      onSubmitEditing={ () => {
-                          onChangeHandler(this.formattedURL());
-                      }}
-                      value={this.state.url}
-                      editable={true}
-                      autoCorrect={false}
-                      autoCapitalize='none'
-                      returnKeyType='go'
-                      underlineColorAndroid='transparent'
-                      keyboardType={Platform.OS === 'ios' ? 'web-search' : 'default'}
-                  />
-                  <TouchableOpacity
-                      style={styles.barButton}
-                      onPress={ () => {
-                          refreshHandler();
-                      }
-                  }>
-                      <Image source={require('./refresh.png')} style={styles.refresh}/>
-                  </TouchableOpacity>
-
-
-                  <Menu onSelect = {value => menuHandler(value)}>
-                    <MenuTrigger>
-                      <Image source={require('./menu.png')} style={styles.refresh}/>
-                    </MenuTrigger>
-                    <MenuOptions>
-                        <MenuOption value={2} text='Sign Out' />
-                        <MenuOption value={3} text='Flag Content' />
-                        <MenuOption value={4} text='Settings' />
-                    </MenuOptions>
-                  </Menu>
-              </View>
-          );
-        }
-
-
     }
 }
 

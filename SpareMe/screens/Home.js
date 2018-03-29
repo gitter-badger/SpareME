@@ -124,7 +124,14 @@ export default class Home extends Component {
             console.log('User Logged Out');
             firebase.auth().signOut();
             break;
-          case 3:
+          case 3: // Create Account
+          this.props.navigation.navigate('CreateAccount');
+            break;
+          case 4: // Flag Conntent
+          this.props.navigation.navigate('CreateAccount');
+            break;
+          case 5: // Settings
+          this.props.navigation.navigate('Settings');
             break;
           default:
             break;
