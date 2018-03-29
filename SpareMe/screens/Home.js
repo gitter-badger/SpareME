@@ -87,7 +87,7 @@ export default class Home extends Component {
             if (!isConnected) {
                 this.setState({
                     isConnected: isConnected,
-                    url: webState.url
+                    url: webState.url,
                 });
             }
         });
@@ -117,10 +117,12 @@ export default class Home extends Component {
 
     menuHandler = (value) => {
         switch(value) {
-          case 1:
+          case 1: //Sign In
             this.props.navigation.navigate('SignIn');
             break;
-          case 2:
+          case 2: //Sign Out
+            console.log('User Logged Out');
+            firebase.auth().signOut();
             break;
           case 3:
             break;
@@ -170,7 +172,6 @@ export default class Home extends Component {
         // if (this.state.user) return <LoggedIn />;
         // The user is null, so they're logged out
         // return <LoggedOut />;
-
         return (
           <MenuProvider>
             <View style={styles.container}>
