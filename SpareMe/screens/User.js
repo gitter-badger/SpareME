@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Button, TextInput, NetInfo } from 'react-native';
+import { Alert, StyleSheet, Text, View, Button, TextInput, NetInfo } from 'react-native';
 import CustomStatusBar from '../components/CustomStatusBar'
 import FilterWebView from '../components/FilterWebView'
 import firebase from 'react-native-firebase';
@@ -38,9 +38,15 @@ export default class User extends Component {
             // `onAuthStateChanged` listener we set up in App.js earlier
         }).catch((error) => {
             const { code, message } = error;
-            // For details of error codes, see the docs
-            // The message contains the default Firebase string
-            // representation of the error
+            console.log(error);
+            Alert.alert(
+              'Login Failed',
+              'Please enter valid credentials',
+              [
+                {text: 'OK', onPress: () => console.log('OK Pressed')},
+              ],
+              { cancelable: false }
+            )
         });
     }
 
@@ -74,27 +80,36 @@ export default class User extends Component {
             <View style={styles.container}>
                 <CustomStatusBar/>
                 <View style={styles.loginView}>
-                    <Text style={{fontSize: 30}}>
+                    <Text style={styles.signInText}>
                         Sign In
                     </Text>
-                    <Text style={{fontSize: 20, paddingTop: 20}}>
+                    <Text style={styles.headerText}>
                         Username:
                     </Text>
                     <TextInput
-                        style= {{width: 150}}
+                        style= {styles.input}
                         placeholder="Enter Email"
+                        underlineColorAndroid={constants.COLOR_WHITE}
+                        autoCapitalize='none'
+                        autoCorrect={false}
+                        selectionColor={constants.COLOR_GRAY}
                         onChangeText={ (text) => {
                             this.setState({
                                 email: text
                             });
                         }}
                     />
-                    <Text style={{fontSize: 20}}>
+                    <Text style={styles.headerText}>
                         Password:
                     </Text>
                     <TextInput
-                        style= {{width: 150}}
+                        style= {styles.input}
                         placeholder="Enter Password"
+                        underlineColorAndroid={constants.COLOR_WHITE}
+                        autoCapitalize='none'
+                        autoCorrect={false}
+                        secureTextEntry={true}
+                        selectionColor={constants.COLOR_GRAY}
                         onChangeText={ (text) => {
                             this.setState({
                                 password: text
@@ -112,8 +127,8 @@ export default class User extends Component {
                         <View style={styles.button}>
                             <Button
                                 title='Cancel'
-                                backgroundColor={'red'}
                                 onPress={() => this.props.navigation.goBack()}
+                                color='red'
                             />
                         </View>
                     </View>
@@ -130,12 +145,14 @@ const styles = StyleSheet.create({
     },
     loginView: {
         padding: 50,
-        flex: 1
+        flex: 1,
+        backgroundColor: constants.COLOR_MAIN,
     },
     buttonContainer: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginTop: 20
     },
     button: {
         width: '40%',
@@ -151,5 +168,22 @@ const styles = StyleSheet.create({
     connectionText: {
         color: constants.COLOR_WHITE,
         fontSize: 24
+    },
+    signInText: {
+        color: constants.COLOR_WHITE,
+        fontSize: 32,
+        marginBottom: 20
+    },
+    headerText: {
+        color: constants.COLOR_WHITE,
+        fontSize: 24,
+        marginBottom: 5
+    },
+    input: {
+        height: 20,
+        alignSelf: 'stretch',
+        fontSize: 16,
+        marginBottom: 10,
+        color: constants.COLOR_WHITE
     }
 });
