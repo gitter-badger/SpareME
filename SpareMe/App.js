@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation'
 import Home from './screens/Home'
 import User from './screens/User'
+import CreateAccount from './screens/CreateAccount'
+import Settings from './screens/Settings'
 
 export default class App extends Component {
     render() {
@@ -17,6 +19,12 @@ const RootStack = StackNavigator(
         },
         SignIn: {
             screen: User,
+        },
+        CreateAccount: {
+            screen: CreateAccount,
+        },
+        Settings: {
+            screen: Settings,
         },
     },
     {
