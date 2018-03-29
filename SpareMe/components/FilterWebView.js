@@ -30,8 +30,16 @@ export default class FilterWebView extends React.Component {
      * Handles data passed from the WebView to React
      */
     onMessage(data) {
-        let messageType = data['messageType'];
-        let predictionBatch = data['content'];
+        let jsonData;
+        try {
+            jsonData = JSON.parse(data);
+        } catch (error) {
+            console.log("Eror parsing JSON data from string '" + data + "''");
+            return;
+        }
+
+        let messageType = jsonData['messageType'];
+        let predictionBatch = jsonData['content'];
 
         switch(messageType) {
             case 'predict':
@@ -85,7 +93,7 @@ export default class FilterWebView extends React.Component {
                 ref='webView'
                 injectedJavaScript={injectedJS}
                 style = {styles.web}
-                onMessage={e => this.onMessage(JSON.parse(e.nativeEvent.data))}
+                onMessage={e => this.onMessage(e.nativeEvent.data)}
             />
         )
     }
