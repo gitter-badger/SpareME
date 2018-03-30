@@ -45,10 +45,23 @@ export const injectedJS = `(${String(function() {
         }
     }
 
-    function hideElement(elementToHide) {
-        elementToHide.style.filter = 'blur(10px)';
-        elementToHide.style.color = 'transparent';
-        elementToHide.style.textShadow = '0 0 5px rgba(0,0,0,0.5)';
+    function hideElement(element) {
+        element.classList.add('SpareMeHidden');
+        element.style.filter = 'blur(10px)';
+        element.onclick = function() {
+            toggleElementBlur(element);
+        }
+    }
+
+    function toggleElementBlur(element) {
+        if (element.classList.contains('SpareMeHidden')) {
+            element.classList.remove('SpareMeHidden');
+            element.classList.add('SpareMeRevealed');
+            element.style.filter = 'blur(0px)';
+        } else if (element.classList.contains('SpareMeRevealed')) {
+            element.classList.remove('SpareMeRevealed');
+            hideElement(element);
+        }
     }
 
     function analyzePage() {
