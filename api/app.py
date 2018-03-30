@@ -220,8 +220,8 @@ def predict_batch():
 
     # predict categories of given text
     for key in request.args:
-        print('analyzing [' + key + '] : [' + request.args[key] + "]")
-        predictions[key] = (cats[gs_clf.predict([request.args[key]])[0]])
+        if key != 'id_token':
+            predictions[key] = (cats[gs_clf.predict([request.args[key]])[0]])
 
     return json.dumps(predictions)
 
