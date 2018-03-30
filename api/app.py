@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request
 from flask_restful import Resource, Api
+import json
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -48,6 +49,39 @@ parameters = {
     'tfidf__use_idf': (True, False),
     'clf__alpha': (1e-2, 1e-3)}
 gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
+
+
+@app.route('/populate', methods=['GET'])
+def populate():
+    # if len(cats) < 2 or any(i < 3 for i in Counter(target).values()):
+    add_strings_to_category(['hello', 'world', 'smile'], 'harmless')
+    add_strings_to_category(['the', 'news', 'scrub'], 'hateful')
+    add_strings_to_category(['trees', 'santa', 'snow'], 'christmas')
+    add_strings_to_category(['virginia', 'tech', 'hokies'], 'awesome')
+
+    return "The models have been populated with sample data."
+
+
+def add_strings_to_category(str_array, category):
+    for text in str_array:
+        if text in data:
+            return "Error: data store already contains text"
+
+        # add given text to in-memory data store
+        data.append(text)
+        if category not in cats:
+            cats.append(category)
+        target.append(cats.index(category))
+
+        # build classifier if pre-requisites satisfied
+        # if len(cats) >= 2:
+        # requires enough categories to make a meaningful prediction
+        # text_clf.fit(data, target)
+        if len(cats) >= 2 and all(i >= 3 for i in Counter(target).values()):
+            # requires enough data to split into training, test, and validation sets
+            gs_clf.fit(data, target)
+
+        print("added " + text + " to category " + category + " which is index " + str(cats.index(category)))
 
 @app.route('/add', methods=['POST'])
 def add():
@@ -103,6 +137,7 @@ def add():
     # return value is arbitrary
     return "added " + text + " to category " + category + " which is index " + str(cats.index(category))
 
+
 @app.route('/predict', methods=['GET'])
 def predict():
     # extract arguments from get request
@@ -111,6 +146,48 @@ def predict():
         id_token = request.args['id_token']
     except KeyError:
         return "Error: must specify the 'text' and 'id_token' args when making a GET to /predict"
+
+    try:
+        # Verify the ID token while checking if the token is revoked by
+        # passing check_revoked=True
+        decoded_token = auth.verify_id_token(id_token, check_revoked=True)
+        # Token is valid and not revoked
+        uid = decoded_token['uid']
+    except ValueError:
+        return "Error: token malformed"
+    except auth.AuthError as exc:
+        if exc.code == 'ID_TOKEN_REVOKED':
+            return "Error: token revoked; user must re-authenticate or sign out"
+        else:
+            return "Error: token invalid"
+
+    # get the actual user from the uid
+    user = auth.get_user(uid)
+    #
+    # # control access using custom claim
+    if user.custom_claims is None or user.custom_claims.get('admin') is not True:
+        # Prevent access to admin resource.
+        return "Error: user is not allowed to access this resource"
+
+    # verify prediction pre-requisites
+    # if len(cats) < 2:
+    if len(cats) < 2 or any(i < 3 for i in Counter(target).values()):
+        return "Error: not enough data to predict"
+
+    # predict category of given text
+    # return cats[text_clf.predict([text])[0]]
+    return cats[gs_clf.predict([text])[0]]
+
+
+# Request format is /predictBatch?SpareMeElement0=<encoded_string>&id_token=<token>
+@app.route('/predictBatch', methods=['GET'])
+def predict_batch():
+    # extract arguments from get request
+    try:
+        id_token = request.args['id_token']
+    except KeyError:
+        return "Error: must specify at least one SpareMeElement<index> arg and id_token arg when making a GET to " \
+               "/predictBatch "
 
     try:
         # Verify the ID token while checking if the token is revoked by
@@ -139,9 +216,15 @@ def predict():
     if len(cats) < 2 or any(i < 3 for i in Counter(target).values()):
         return "Error: not enough data to predict"
 
-    # predict category of given text
-    # return cats[text_clf.predict([text])[0]]
-    return cats[gs_clf.predict([text])[0]]
+    predictions = {}
+
+    # predict categories of given text
+    for key in request.args:
+        if key != 'id_token':
+            predictions[key] = (cats[gs_clf.predict([request.args[key]])[0]])
+
+    return json.dumps(predictions)
+
 
 @app.route('/reset', methods=['GET'])
 def reset():
@@ -161,7 +244,7 @@ def reset():
         return "Error: token malformed"
     except auth.AuthError as exc:
         if exc.code == 'ID_TOKEN_REVOKED':
-            return "Error: token revoked; user must reauthenticate or sign out"
+            return "Error: token revoked; user must re-authenticate or sign out"
         else:
             return "Error: token invalid"
 
@@ -178,3 +261,5 @@ def reset():
     cats = []
     data = []
     target = []
+
+    return "cleared"
