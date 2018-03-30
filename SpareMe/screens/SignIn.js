@@ -6,7 +6,7 @@ import FilterWebView from '../components/FilterWebView'
 import firebase from 'react-native-firebase';
 import * as constants from 'constants'
 
-export default class User extends Component {
+export default class SignIn extends Component {
     constructor(props) {
         super(props);
         this.state = {};
@@ -38,10 +38,17 @@ export default class User extends Component {
             // `onAuthStateChanged` listener we set up in App.js earlier
         }).catch((error) => {
             const { code, message } = error;
-            console.log(error);
+            console.log(message);
+            var alertMessage = 'Unable to login.'
+            if (message.includes('There is no user record') || message.includes('email address')) {
+                alertMessage = constants.INCORRECT_EMAIL;
+            }
+            else if (message.includes('The password is invalid')) {
+                alertMessage = constants.INCORRECT_PASSWORD;
+            }
             Alert.alert(
               'Login Failed',
-              'Please enter valid credentials',
+              alertMessage,
               [
                 {text: 'OK', onPress: () => console.log('OK Pressed')},
               ],
@@ -84,7 +91,7 @@ export default class User extends Component {
                         Sign In
                     </Text>
                     <Text style={styles.headerText}>
-                        Username:
+                        Email:
                     </Text>
                     <TextInput
                         style= {styles.input}

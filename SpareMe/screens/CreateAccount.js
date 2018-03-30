@@ -39,9 +39,16 @@ export default class CreateAccount extends Component {
         }).catch((error) => {
             const { code, message } = error;
             console.log(error);
+            var alertMessage = 'Unable to create account.'
+            if (message.includes('email address')) {
+                alertMessage = constants.INVALID_EMAIL;
+            }
+            else if (message.includes('The given password')) {
+                alertMessage = constants.INVALID_PASSWORD;
+            }
             Alert.alert(
-              'Login Failed',
-              'Please enter valid credentials',
+              'Create Account Failed',
+              alertMessage,
               [
                 {text: 'OK', onPress: () => console.log('OK Pressed')},
               ],
@@ -69,7 +76,7 @@ export default class CreateAccount extends Component {
                         Create An Account
                     </Text>
                     <Text style={styles.headerText}>
-                        Username:
+                        Email:
                     </Text>
                     <TextInput
                         style={styles.input}

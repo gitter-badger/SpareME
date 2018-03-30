@@ -9,9 +9,6 @@ import FilterWebView from '../components/FilterWebView'
 import firebase from 'react-native-firebase';
 import {MenuProvider} from 'react-native-popup-menu'
 
-// Components to show on login/logout
-// import LoggedIn from './LoggedIn';
-// import LoggedOut from './LoggedOut';
 
 export default class Home extends Component {
     constructor(props) {
@@ -117,20 +114,17 @@ export default class Home extends Component {
 
     menuHandler = (value) => {
         switch(value) {
-          case 1: //Sign In
+          case constants.SIGN_IN: //Sign In
             this.props.navigation.navigate('SignIn');
             break;
-          case 2: //Sign Out
+          case constants.SIGN_OUT: //Sign Out
             console.log('User Logged Out');
             firebase.auth().signOut();
             break;
-          case 3: // Create Account
+          case constants.CREATE_ACCOUNT: // Create Account
           this.props.navigation.navigate('CreateAccount');
             break;
-          case 4: // Flag Conntent
-          this.props.navigation.navigate('CreateAccount');
-            break;
-          case 5: // Settings
+          case constants.SETTINGS: // Settings
           this.props.navigation.navigate('Settings');
             break;
           default:

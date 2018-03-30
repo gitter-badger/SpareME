@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation'
 import Home from './screens/Home'
-import User from './screens/User'
+import SignIn from './screens/SignIn'
 import CreateAccount from './screens/CreateAccount'
 import Settings from './screens/Settings'
 
@@ -18,7 +18,7 @@ const RootStack = StackNavigator(
             screen: Home,
         },
         SignIn: {
-            screen: User,
+            screen: SignIn,
         },
         CreateAccount: {
             screen: CreateAccount,

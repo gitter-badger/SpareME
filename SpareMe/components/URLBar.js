@@ -111,10 +111,9 @@ class URLBar extends Component {
                       <Image source={require('./menu.png')} style={styles.refresh}/>
                     </MenuTrigger>
                     <MenuOptions>
-                        {firebase.auth().currentUser == null ? <MenuOption value={1} text='Sign In' /> : <MenuOption value={2} text='Sign Out' />}
-                        {firebase.auth().currentUser == null ? <MenuOption value={3} text='Create Account' /> : null}
-                        <MenuOption value={4} text='Flag Content' />
-                        {firebase.auth().currentUser == null ? null : <MenuOption value={5} text='Settings' />}
+                        {firebase.auth().currentUser == null ? <MenuOption value={constants.SIGN_IN} text='Sign In' /> : <MenuOption value={constants.SIGN_OUT} text='Sign Out' />}
+                        {firebase.auth().currentUser == null ? <MenuOption value={constants.CREATE_ACCOUNT} text='Create Account' /> : null}
+                        {firebase.auth().currentUser == null ? null : <MenuOption value={constants.SETTINGS} text='Settings' />}
                     </MenuOptions>
                   </Menu>
               </View>
