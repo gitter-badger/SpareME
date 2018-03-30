@@ -118,7 +118,7 @@ export default class User extends Component {
                     />
 
                     <View style={styles.buttonContainer}>
-                        <View style={styles.button}>
+                        <View style={styles.leftButton}>
                             <Button
                                 title='Sign In'
                                 onPress={this.onLogin}
@@ -154,8 +154,13 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 20
     },
+    leftButton: {
+        flex: 1,
+        height: 40,
+        marginRight: 10
+    },
     button: {
-        width: '40%',
+        flex: 1,
         height: 40
     },
     connectionContainer: {

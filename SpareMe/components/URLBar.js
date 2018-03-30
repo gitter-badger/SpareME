@@ -114,7 +114,7 @@ class URLBar extends Component {
                         {firebase.auth().currentUser == null ? <MenuOption value={1} text='Sign In' /> : <MenuOption value={2} text='Sign Out' />}
                         {firebase.auth().currentUser == null ? <MenuOption value={3} text='Create Account' /> : null}
                         <MenuOption value={4} text='Flag Content' />
-                        <MenuOption value={5} text='Settings' />
+                        {firebase.auth().currentUser == null ? null : <MenuOption value={5} text='Settings' />}
                     </MenuOptions>
                   </Menu>
               </View>

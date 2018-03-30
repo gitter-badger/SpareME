@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Button, TextInput, NetInfo } from 'react-native';
+import { Alert, StyleSheet, Text, View, Button, TextInput, NetInfo } from 'react-native';
 import CustomStatusBar from '../components/CustomStatusBar'
 import FilterWebView from '../components/FilterWebView'
 import firebase from 'react-native-firebase';
@@ -29,17 +29,26 @@ export default class Settings extends Component {
     }
 
     onDelete = () => {
-
-      if (firebase.auth().currentUser == null) {
-        this.props.navigation.navigate('SignIn');
-      } else {
-        firebase.auth().currentUser.delete().then(function() {
-        // User deleted
-        }).catch(function(error) {
-        // An error happened.
-        });
-        this.props.navigation.goBack();
-      }
+        Alert.alert(
+          'Delete Account',
+          'Are you sure you want to delete the account?',
+          [
+            {text: 'Delete', onPress: () => {
+                if (firebase.auth().currentUser == null) {
+                  this.props.navigation.navigate('SignIn');
+                } else {
+                  firebase.auth().currentUser.delete().then(function() {
+                  // User deleted
+                  }).catch(function(error) {
+                  // An error happened.
+                  });
+                  this.props.navigation.goBack();
+                }
+            }},
+            {text: 'Cancel', onPress: () => console.log('cancelled')}
+          ],
+          { cancelable: false }
+        )
     }
 
     render() {
@@ -55,12 +64,12 @@ export default class Settings extends Component {
         }
         return (
             <View style={styles.container}>
-                <View style={styles.loginView}>
-                    <Text style={{fontSize: 30}}>
+                <View style={styles.settingsView}>
+                    <Text style={styles.settingsText}>
                         Settings
                     </Text>
                     <View style={styles.buttonContainer}>
-                        <View style={styles.button}>
+                        <View style={styles.leftButton}>
                             <Button
                                 title='Delete Account'
                                 onPress={this.onDelete}
@@ -69,13 +78,12 @@ export default class Settings extends Component {
                         <View style={styles.button}>
                             <Button
                                 title='Cancel'
-                                backgroundColor={'red'}
+                                color={'red'}
                                 onPress={() => this.props.navigation.goBack()}
                             />
                         </View>
                     </View>
                 </View>
-
             </View>
 
         );
@@ -86,19 +94,25 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    loginView: {
+    settingsView: {
         padding: 50,
-        flex: 1
+        flex: 1,
+        backgroundColor: constants.COLOR_MAIN,
     },
     buttonContainer: {
         flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'space-between'
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20
+    },
+    leftButton: {
+        flex: 1,
+        height: 40,
+        marginRight: 10
     },
     button: {
-        width: '40%',
-        height: 40,
-        padding: 10
+        flex: 1,
+        height: 40
     },
     connectionContainer: {
         flex: 1,
@@ -110,5 +124,10 @@ const styles = StyleSheet.create({
     connectionText: {
         color: constants.COLOR_WHITE,
         fontSize: 24
+    },
+    settingsText: {
+        color: constants.COLOR_WHITE,
+        fontSize: 32,
+        marginBottom: 20
     }
 });
