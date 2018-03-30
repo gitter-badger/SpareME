@@ -48,19 +48,21 @@ export const injectedJS = `(${String(function() {
     function hideElement(element) {
         element.classList.add('SpareMeHidden');
         element.style.filter = 'blur(10px)';
-        element.onclick = function() {
-            toggleElementBlur(element);
-        }
+        element.addEventListener('click', onHiddenElementClick(element));
     }
 
-    function toggleElementBlur(element) {
-        if (element.classList.contains('SpareMeHidden')) {
-            element.classList.remove('SpareMeHidden');
-            element.classList.add('SpareMeRevealed');
-            element.style.filter = 'blur(0px)';
-        } else if (element.classList.contains('SpareMeRevealed')) {
-            element.classList.remove('SpareMeRevealed');
-            hideElement(element);
+    function onHiddenElementClick(element) {
+        return function(event) {
+            if (element.classList.contains('SpareMeHidden')) {
+                /* Element must be revealed before allowing
+                its normal onclick to fire */
+                event.preventDefault();
+
+                // Reveal the element
+                element.classList.remove('SpareMeHidden');
+                element.classList.add('SpareMeRevealed');
+                element.style.filter = 'blur(0px)';
+            }
         }
     }
 
