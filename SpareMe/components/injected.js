@@ -53,7 +53,9 @@ export const injectedJS = `(${String(function() {
 
     function onHiddenElementClick(element) {
         return function(event) {
-            if (element.classList.contains('SpareMeHidden')) {
+            console.log("called onHiddenElementClick");
+
+            if (isHidden(element)) {
                 /* Element must be revealed before allowing
                 its normal onclick to fire */
                 event.preventDefault();
@@ -67,7 +69,7 @@ export const injectedJS = `(${String(function() {
     }
 
     function analyzePage() {
-        var elements = document.body.querySelectorAll('p, a, li, span');
+        var elements = document.body.querySelectorAll('p, a, li');
         var predictionGroup = {}
         for (var i = 0; i < elements.length; i++) {
             var element = elements[i]
@@ -89,7 +91,28 @@ export const injectedJS = `(${String(function() {
 
                 predictionGroup = {}
             }
+
+            element.addEventListener('click', onPageElementClick(element));
         }
+    }
+
+    function onPageElementClick(element) {
+        return function(event) {
+            console.log("called onPageElementClick");
+            console.log("element is hidden: " + isHidden(element))
+            if (!isHidden(element)) {
+                event.stopPropagation();
+                element.style.color = 'red';
+            }
+        }
+    }
+
+    function isHidden(element) {
+        return element.classList.contains('SpareMeHidden');
+    }
+
+    function isRevealed(element) {
+        return element.classList.contains('SpareMeRevealed');
     }
 
 })})();` // JavaScript :)
