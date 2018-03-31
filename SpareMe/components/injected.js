@@ -100,9 +100,20 @@ export const injectedJS = `(${String(function() {
         return function(event) {
             console.log("called onPageElementClick");
             console.log("element is hidden: " + isHidden(element))
-            if (!isHidden(element)) {
+            if (!isHidden(element) && !isRevealed(element)) {
                 event.stopPropagation();
+
+                // TODO remove. for testing only
                 element.style.color = 'red';
+
+                // Alert React that an element was selected
+                window.postMessage(JSON.stringify({
+                    messageType: 'hide',
+                    text : String(element.tagName === 'img' ? element.alt : element.innerText),
+                    category: 'hateful' // TODO let user pick category 
+                }));
+
+                hideElement(element);
             }
         }
     }

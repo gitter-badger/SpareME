@@ -39,10 +39,18 @@ export default class FilterWebView extends React.Component {
         }
 
         let messageType = jsonData['messageType'];
-        let predictionBatch = jsonData['content'];
+
+        console.log("got message type: " + messageType);
 
         switch(messageType) {
+            case 'hide':
+                console.log("adding new text to the API!");
+                api.addTextToCategory(jsonData['text'], jsonData['category'],
+                    this.props.idToken);
+                break;
             case 'predict':
+                let predictionBatch = jsonData['content'];
+
                 api.getCategoriesForBatch(predictionBatch, this.props.idToken,
                     (response) => {
                         try {
