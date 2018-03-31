@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request
 from flask_restful import Resource, Api
 import json
+
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -9,6 +10,7 @@ from sklearn.model_selection import GridSearchCV
 # from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
 from collections import Counter
+
 import firebase_admin
 from firebase_admin import auth, credentials
 
@@ -51,6 +53,11 @@ parameters = {
 gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
 
 
+@app.route('/')
+def index():
+    return 'Hello World!'
+
+
 @app.route('/populate', methods=['GET'])
 def populate():
     # if len(cats) < 2 or any(i < 3 for i in Counter(target).values()):
@@ -82,6 +89,7 @@ def add_strings_to_category(str_array, category):
             gs_clf.fit(data, target)
 
         print("added " + text + " to category " + category + " which is index " + str(cats.index(category)))
+
 
 @app.route('/add', methods=['POST'])
 def add():
