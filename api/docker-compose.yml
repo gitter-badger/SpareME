@@ -14,8 +14,6 @@ services:
   flask:
     build: ./flask
     image: flask
-    ports:
-     - "5000:5000"
     env_file:
       - env_file
     networks:
@@ -24,10 +22,23 @@ services:
     depends_on:
       - db
     restart: always
+  nginx:
+    build: ./nginx
+    image: nginx
+    ports:
+      - "80:80"
+    networks:
+      - nginx_nw
+      - flask_nw
+    depends_on:
+      - flask
+    restart: always
 networks:
   db_nw:
     driver: bridge
   flask_nw:
+    driver: bridge
+  nginx_nw:
     driver: bridge
 
 volumes:
