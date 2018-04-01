@@ -73,7 +73,7 @@ export default class CreateAccount extends Component {
                 <CustomStatusBar/>
                 <View style={styles.createView}>
                     <Text style={styles.createText}>
-                        Create An Account
+                        Create Account
                     </Text>
                     <Text style={styles.headerText}>
                         Email:
