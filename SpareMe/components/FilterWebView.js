@@ -30,22 +30,40 @@ export default class FilterWebView extends React.Component {
      * Handles data passed from the WebView to React
      */
     onMessage(data) {
-        let messageType = data['messageType'];
-        let addedClass = data['addedClass'];
-        let innerText = data['content'];
+        let jsonData;
+        try {
+            jsonData = JSON.parse(data);
+        } catch (error) {
+            console.log("Eror parsing JSON data from string '" + data + "''");
+            return;
+        }
+
+        let messageType = jsonData['messageType'];
+        let predictionBatch = jsonData['content'];
 
         switch(messageType) {
             case 'predict':
-                api.getCategoryForString(innerText, this.props.idToken,
-                    (category) => {
-                        if (category === constants.HATEFUL) {
-                            console.log('hiding: ' + innerText);
-                            this.postMessage({
-                                name: 'hide',
-                                className: addedClass
-                            });
-                        } else {
-                            console.log(innerText + ' is in category: ' + category);
+                api.getCategoriesForBatch(predictionBatch, this.props.idToken,
+                    (response) => {
+                        try {
+                            console.log('got response: ' + response);
+                            let responseJSON = JSON.parse(response)
+                            for (var key in responseJSON) {
+                                if (!responseJSON.hasOwnProperty(key)) continue;
+
+                                let category = responseJSON[key];
+                                if (category === constants.HATEFUL) {
+                                    console.log('hiding: ' + key);
+                                    this.postMessage({
+                                        name: 'hide',
+                                        className: key
+                                    });
+                                } else {
+                                    console.log(key + ' is in category: ' + category);
+                                }
+                            }
+                        } catch (error) {
+                            console.log(error)
                         }
                     })
                 break;
@@ -75,7 +93,7 @@ export default class FilterWebView extends React.Component {
                 ref='webView'
                 injectedJavaScript={injectedJS}
                 style = {styles.web}
-                onMessage={e => this.onMessage(JSON.parse(e.nativeEvent.data))}
+                onMessage={e => this.onMessage(e.nativeEvent.data)}
             />
         )
     }

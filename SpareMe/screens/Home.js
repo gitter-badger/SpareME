@@ -1,13 +1,13 @@
 'use strict';
 import React, { Component } from 'react';
-import { StyleSheet, ActivityIndicator, View, Button, NetInfo, Text } from 'react-native';
+import { StyleSheet, ActivityIndicator, View, Button, NetInfo, Text, TouchableOpacity } from 'react-native';
 import CustomStatusBar from '../components/CustomStatusBar'
 import URLBar from '../components/URLBar'
+import Menu from '../components/Menu'
 import * as api from 'ml-api'
 import * as constants from 'constants'
 import FilterWebView from '../components/FilterWebView'
 import firebase from 'react-native-firebase';
-import {MenuProvider} from 'react-native-popup-menu'
 
 
 export default class Home extends Component {
@@ -16,9 +16,9 @@ export default class Home extends Component {
         this.state = {
             url: 'https://www.google.com/',
             loading: true,
+            menu: false
         };
         NetInfo.isConnected.fetch().then(isConnected => {
-            console.log(isConnected);
             this.setState({isConnected: isConnected});
         });
     }
@@ -107,7 +107,6 @@ export default class Home extends Component {
     }
 
     webErrorHandler = (e) => {
-        console.log(e.nativeEvent.code);
         const text = constants.GOOGLE_SEARCH + this.state.url.replace('https://', 'http://').replace('http://', '');
         this.setState({url: text});
     }
@@ -145,6 +144,18 @@ export default class Home extends Component {
         );
     }
 
+    addFullscreen = () => {
+        this.setState({
+           menu: true,
+           bottomBarY: this.urlBar.getBottomYPosition()
+        });
+
+    }
+
+    removeFullscreen = () => {
+        this.setState({menu: false});
+    }
+
     render() {
         if (!this.state.isConnected) {
             return(
@@ -174,7 +185,6 @@ export default class Home extends Component {
         // The user is null, so they're logged out
         // return <LoggedOut />;
         return (
-          <MenuProvider>
             <View style={styles.container}>
                 <CustomStatusBar/>
                 <URLBar
@@ -182,7 +192,7 @@ export default class Home extends Component {
                     forwardHandler={this.forwardHandler}
                     refreshHandler={this.refresh}
                     onChangeHandler={this.textChangeHandler}
-                    menuHandler={this.menuHandler}
+                    onMenuPressed={this.addFullscreen}
                     url={this.state.url}
                     onRef={ref => (this.urlBar = ref)}/>
                 <FilterWebView
@@ -193,8 +203,12 @@ export default class Home extends Component {
                     onError={this.webErrorHandler}
                     renderError={this.renderError}
                     onRef={ref => (this.webView = ref)}/>
+                {this.state.menu ? (<TouchableOpacity style={styles.fullscreen} onPress={this.removeFullscreen} />) : null}
+                {this.state.menu ? (
+                    <View style={[styles.menu, {top: this.state.bottomBarY}]}>
+                        <Menu menuHandler={this.menuHandler} />
+                    </View>) : null}
             </View>
-          </MenuProvider>
         );
     }
 }
@@ -218,5 +232,19 @@ const styles = StyleSheet.create({
     connectionText: {
         color: constants.COLOR_WHITE,
         fontSize: 24
+    },
+    fullscreen: {
+        height: '100%',
+        width: '100%',
+        zIndex: 5,
+        position: 'absolute'
+    }
+    ,
+    menu: {
+        width: '75%',
+        bottom: 0,
+        right: 0,
+        zIndex: 10,
+        position: 'absolute'
     }
 });

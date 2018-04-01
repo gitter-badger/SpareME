@@ -3,9 +3,10 @@
  */
 
 const ADD = "add";
-const BASE_URL = "http://ec2-18-188-74-206.us-east-2.compute.amazonaws.com:5000/";
+const BASE_URL = "http://spareme.pw:5000/";
 const DEFAULT_CATEGORY = "harmless";
 const PREDICT = "predict?text=";
+const PREDICT_BATCH = "predictBatch?"
 const ID_TOKEN = "&id_token="
 
 /**
@@ -35,6 +36,32 @@ export function getCategoryForString(str, idToken, callback) {
     }).catch(error => {
         //console.log(error);
     });
+}
+
+/**
+ * Gets categories for a group of Strings
+ *
+ * @param group a JSON object whose keys are the Strings to analyze
+ */
+export function getCategoriesForBatch(batch, idToken, callback) {
+    fetch(createBatchQuery(batch, idToken)).then(function(response) {
+        callback(response._bodyText);
+    });
+}
+
+export function createBatchQuery(batch, idToken) {
+    let url = BASE_URL + PREDICT_BATCH;
+    var query_args = [];
+
+    for (var key in batch) {
+        if (batch.hasOwnProperty(key)) {
+            query_args.push(encodeURIComponent(key) + "=" + encodeURIComponent(batch[key]))
+        }
+    }
+
+    url += query_args.join("&") + ID_TOKEN + encodeURIComponent(idToken);
+    console.log("fetching batch from: " + url)
+    return url
 }
 
 /**

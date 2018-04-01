@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Image, TextInput, TouchableOpacity, Platform, View } from 'react-native';
 import * as constants from 'constants';
-import {MenuProvider, Menu, MenuOptions, MenuOption, MenuTrigger} from 'react-native-popup-menu'
 import firebase from 'react-native-firebase';
 
 class URLBar extends Component {
@@ -54,10 +53,18 @@ class URLBar extends Component {
         }
     }
 
+    onLayout = (e) => {
+        this.bottomBarY = e.nativeEvent.layout.y + e.nativeEvent.layout.height;
+    }
+
+    getBottomYPosition() {
+        return this.bottomBarY;
+    }
+
     render() {
-        const {backHandler, forwardHandler, refreshHandler, onChangeHandler, menuHandler, url} = this.props;
+        const {backHandler, forwardHandler, refreshHandler, onChangeHandler, onMenuPressed, url} = this.props;
           return (
-              <View style={styles.bar}>
+              <View style={styles.bar} onLayout={this.onLayout}>
                   <TouchableOpacity
                       disabled={!this.state.canGoBack}
                       style={styles.barButton}
@@ -104,18 +111,12 @@ class URLBar extends Component {
                   }>
                       <Image source={require('./refresh.png')} style={styles.refresh}/>
                   </TouchableOpacity>
-
-
-                  <Menu onSelect = {value => menuHandler(value)}>
-                    <MenuTrigger>
+                  <TouchableOpacity
+                      style={styles.barButton}
+                      onPress={onMenuPressed}
+                  >
                       <Image source={require('./menu.png')} style={styles.refresh}/>
-                    </MenuTrigger>
-                    <MenuOptions>
-                        {firebase.auth().currentUser == null ? <MenuOption value={constants.SIGN_IN} text='Sign In' /> : <MenuOption value={constants.SIGN_OUT} text='Sign Out' />}
-                        {firebase.auth().currentUser == null ? <MenuOption value={constants.CREATE_ACCOUNT} text='Create Account' /> : null}
-                        {firebase.auth().currentUser == null ? null : <MenuOption value={constants.SETTINGS} text='Settings' />}
-                    </MenuOptions>
-                  </Menu>
+                  </TouchableOpacity>
               </View>
           );
     }
