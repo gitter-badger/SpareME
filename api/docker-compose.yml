@@ -16,6 +16,10 @@ services:
     image: flask
     env_file:
       - env_file
+    environment:
+      VIRTUAL_HOST: spareme.pw,www.spareme.pw
+      LETSENCRYPT_HOST: spareme.pw,www.spareme.pw
+      LETSENCRYPT_EMAIL: cjroboto@protonmail.ch
     networks:
       - db_nw
       - flask_nw
@@ -23,17 +27,41 @@ services:
       - db
     restart: always
   nginx:
+    container_name: nginx
     build: ./nginx
     image: nginx
     ports:
       # use port 8080 instead of 80 for local deployments
       # - "8080:80"
       - "80:80"
+      - "443:443"
+    volumes:
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs
+      - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
       - nginx_nw
       - flask_nw
+      - web_nw
     depends_on:
       - flask
+    restart: always
+  letsencrypt:
+    container_name: letsencrypt
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    environment:
+      NGINX_PROXY_CONTAINER: nginx
+      NGINX_DOCKER_GEN_CONTAINER: nginx
+    volumes:
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - nginx_nw
+    depends_on:
+      - nginx
     restart: always
 networks:
   db_nw:
@@ -42,7 +70,12 @@ networks:
     driver: bridge
   nginx_nw:
     driver: bridge
+  web_nw:
+    driver: bridge
 
 volumes:
   # name the volume so database is copied from previous docker-compose runs
   dbdata:
+  vhost:
+  html:
+  certs:
