@@ -9,6 +9,8 @@ RUN conda update -n base conda && \
         python=3 \
         scikit-learn \
         flask=0.12 \
+        SQLAlchemy \
+        psycopg2 \
         flask-restful
 
 # alternative to `source activate flask`

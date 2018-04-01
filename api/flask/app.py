@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from flask import Flask
 from flask import request
@@ -16,6 +17,10 @@ from collections import Counter
 import firebase_admin
 from firebase_admin import auth, credentials
 
+from models import Label, LabeledText, Classifier
+import database
+from database import db_session
+
 # initialize the firebase server/admin SDK
 cred = credentials.Certificate('firebase-private-key.json')
 default_app = firebase_admin.initialize_app(cred)
@@ -28,6 +33,8 @@ app = Flask(__name__)
 api = Api(app)
 
 app.secret_key = os.environ['APP_SECRET_KEY']
+
+database.init_db()
 
 # in-memory data store. begins empty
 cats = []
@@ -131,6 +138,16 @@ def add():
     # verify prediction pre-requisites
     if text in data:
         return "Error: data store already contains text"
+
+    db_label = db_session.query(Label).filter_by(label=category).first()
+    if not db_label:
+        db_session.add(Label(label=category))
+        db_session.commit()
+        db_label = db_session.query(Label).filter_by(label=category).first()
+
+    labeled_text = LabeledText(timestamp=datetime.now(), uid=uid, label=db_label.id, text=text)
+    db_session.add(labeled_text)
+    db_session.commit()
 
     # add given text to in-memory data store
     data.append(text)
