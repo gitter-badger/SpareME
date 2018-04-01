@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask import request
 from flask_restful import Resource, Api
@@ -24,6 +26,8 @@ default_app = firebase_admin.initialize_app(cred)
 
 app = Flask(__name__)
 api = Api(app)
+
+app.secret_key = os.environ['APP_SECRET_KEY']
 
 # in-memory data store. begins empty
 cats = []
