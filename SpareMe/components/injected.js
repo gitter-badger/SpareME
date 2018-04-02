@@ -45,10 +45,25 @@ export const injectedJS = `(${String(function() {
         }
     }
 
-    function hideElement(elementToHide) {
-        elementToHide.style.filter = 'blur(10px)';
-        elementToHide.style.color = 'transparent';
-        elementToHide.style.textShadow = '0 0 5px rgba(0,0,0,0.5)';
+    function hideElement(element) {
+        element.classList.add('SpareMeHidden');
+        element.style.filter = 'blur(10px)';
+        element.addEventListener('click', onHiddenElementClick(element));
+    }
+
+    function onHiddenElementClick(element) {
+        return function(event) {
+            if (element.classList.contains('SpareMeHidden')) {
+                /* Element must be revealed before allowing
+                its normal onclick to fire */
+                event.preventDefault();
+
+                // Reveal the element
+                element.classList.remove('SpareMeHidden');
+                element.classList.add('SpareMeRevealed');
+                element.style.filter = 'blur(0px)';
+            }
+        }
     }
 
     function analyzePage() {
