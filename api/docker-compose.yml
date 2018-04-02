@@ -17,6 +17,9 @@ services:
     env_file:
       - env_file
     environment:
+      # use test.spareme.pw for test instance
+      # VIRTUAL_HOST: test.spareme.pw
+      # LETSENCRYPT_HOST: test.spareme.pw
       VIRTUAL_HOST: spareme.pw,www.spareme.pw
       LETSENCRYPT_HOST: spareme.pw,www.spareme.pw
       LETSENCRYPT_EMAIL: cjroboto@protonmail.ch
