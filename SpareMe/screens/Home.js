@@ -1,16 +1,14 @@
 'use strict';
 import React, { Component } from 'react';
-import { StyleSheet, ActivityIndicator, View, Button } from 'react-native';
+import { StyleSheet, ActivityIndicator, View, Button, NetInfo, Text, TouchableOpacity } from 'react-native';
 import CustomStatusBar from '../components/CustomStatusBar'
 import URLBar from '../components/URLBar'
+import Menu from '../components/Menu'
 import * as api from 'ml-api'
 import * as constants from 'constants'
 import FilterWebView from '../components/FilterWebView'
 import firebase from 'react-native-firebase';
 
-// Components to show on login/logout
-// import LoggedIn from './LoggedIn';
-// import LoggedOut from './LoggedOut';
 
 export default class Home extends Component {
     constructor(props) {
@@ -18,7 +16,11 @@ export default class Home extends Component {
         this.state = {
             url: 'https://www.google.com/',
             loading: true,
+            menu: false
         };
+        NetInfo.isConnected.fetch().then(isConnected => {
+            this.setState({isConnected: isConnected});
+        });
     }
 
     /**
@@ -28,6 +30,7 @@ export default class Home extends Component {
     * (logged out) or an Object (logged in)
     */
     componentDidMount() {
+        NetInfo.isConnected.addEventListener('connectionChange', this.onConnectivityChange);
         var self = this;
         this.authSubscription = firebase.auth().onAuthStateChanged((user) => {
             if (user) {
@@ -35,7 +38,10 @@ export default class Home extends Component {
                 user.getIdToken(/* forceRefresh */ true)
                 .then(function(result) {
                     console.log('got idToken: ' + result);
-                    self.setState({idToken: result});
+                    self.setState({
+                        idToken: result,
+                        user: user
+                    });
                 })
                 .catch(function(error) {
                     console.log('authentication error: ' + error);
@@ -43,7 +49,7 @@ export default class Home extends Component {
             }
             self.setState({
                 loading: false,
-                user,
+                user: null,
             });
         });
     }
@@ -53,15 +59,35 @@ export default class Home extends Component {
      * when the component unmounts.
      */
     componentWillUnmount() {
-      this.authSubscription();
+        NetInfo.removeEventListener('connectionChange', this.onConnectivityChange);
+        this.authSubscription();
+    }
+
+    onConnectivityChange = isConnected => {
+        if (isConnected) {
+            this.setState({isConnected: isConnected});
+        }
     }
 
     textChangeHandler = (text) => {
-        this.setState({url: text});
+        NetInfo.isConnected.fetch().then(isConnected => {
+            this.setState({
+                isConnected: isConnected,
+                url: text
+            });
+        });
     }
 
     navChangeHandler = (webState) => {
         this.urlBar.update(webState);
+        NetInfo.isConnected.fetch().then(isConnected => {
+            if (!isConnected) {
+                this.setState({
+                    isConnected: isConnected,
+                    url: webState.url,
+                });
+            }
+        });
     }
 
     onWindowMessage(data) {
@@ -81,9 +107,28 @@ export default class Home extends Component {
     }
 
     webErrorHandler = (e) => {
-        console.log(e.nativeEvent.code);
         const text = constants.GOOGLE_SEARCH + this.state.url.replace('https://', 'http://').replace('http://', '');
         this.setState({url: text});
+    }
+
+    menuHandler = (value) => {
+        switch(value) {
+          case constants.SIGN_IN: //Sign In
+            this.props.navigation.navigate('SignIn');
+            break;
+          case constants.SIGN_OUT: //Sign Out
+            console.log('User Logged Out');
+            firebase.auth().signOut();
+            break;
+          case constants.CREATE_ACCOUNT: // Create Account
+          this.props.navigation.navigate('CreateAccount');
+            break;
+          case constants.SETTINGS: // Settings
+          this.props.navigation.navigate('Settings');
+            break;
+          default:
+            break;
+        }
     }
 
     renderError = () => {
@@ -99,14 +144,46 @@ export default class Home extends Component {
         );
     }
 
+    addFullscreen = () => {
+        this.setState({
+           menu: true,
+           bottomBarY: this.urlBar.getBottomYPosition()
+        });
+
+    }
+
+    removeFullscreen = () => {
+        this.setState({menu: false});
+    }
+
     render() {
+        if (!this.state.isConnected) {
+            return(
+                <View style={styles.container}>
+                    <CustomStatusBar/>
+                    <View style={styles.connectionContainer}>
+                        <Text style={styles.connectionText}>Unable to connect. Please check your network settings.</Text>
+                    </View>
+                </View>
+            );
+        }
         // The application is initialising
-        if (this.state.loading) return null;
+        if (this.state.loading) {
+            return(
+                <View style={styles.activityView}>
+                    <ActivityIndicator
+                        animating={true}
+                        color='#84888d'
+                        size='large'
+                        hidesWhenStopped={true}
+                    />
+                </View>
+            );
+        }
         // The user is an Object, so they're logged in
         // if (this.state.user) return <LoggedIn />;
         // The user is null, so they're logged out
         // return <LoggedOut />;
-
         return (
             <View style={styles.container}>
                 <CustomStatusBar/>
@@ -115,6 +192,7 @@ export default class Home extends Component {
                     forwardHandler={this.forwardHandler}
                     refreshHandler={this.refresh}
                     onChangeHandler={this.textChangeHandler}
+                    onMenuPressed={this.addFullscreen}
                     url={this.state.url}
                     onRef={ref => (this.urlBar = ref)}/>
                 <FilterWebView
@@ -125,9 +203,11 @@ export default class Home extends Component {
                     onError={this.webErrorHandler}
                     renderError={this.renderError}
                     onRef={ref => (this.webView = ref)}/>
-                <Button
-                    title="Log In"
-                    onPress={() => this.props.navigation.navigate('SignIn')}/>
+                {this.state.menu ? (<TouchableOpacity style={styles.fullscreen} onPress={this.removeFullscreen} />) : null}
+                {this.state.menu ? (
+                    <View style={[styles.menu, {top: this.state.bottomBarY}]}>
+                        <Menu menuHandler={this.menuHandler} />
+                    </View>) : null}
             </View>
         );
     }
@@ -141,5 +221,30 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1
+    },
+    connectionContainer: {
+        flex: 1,
+        backgroundColor: constants.COLOR_MAIN,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 30
+    },
+    connectionText: {
+        color: constants.COLOR_WHITE,
+        fontSize: 24
+    },
+    fullscreen: {
+        height: '100%',
+        width: '100%',
+        zIndex: 5,
+        position: 'absolute'
+    }
+    ,
+    menu: {
+        width: '75%',
+        bottom: 0,
+        right: 0,
+        zIndex: 10,
+        position: 'absolute'
     }
 });

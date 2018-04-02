@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Image, TextInput, TouchableOpacity, Platform, View } from 'react-native';
 import * as constants from 'constants';
+import firebase from 'react-native-firebase';
 
 class URLBar extends Component {
 
@@ -10,7 +11,7 @@ class URLBar extends Component {
         this.state = {
             url: props.url,
             canGoBack: false,
-            canGoForward: false
+            canGoForward: false,
         };
     }
 
@@ -52,58 +53,72 @@ class URLBar extends Component {
         }
     }
 
+    onLayout = (e) => {
+        this.bottomBarY = e.nativeEvent.layout.y + e.nativeEvent.layout.height;
+    }
+
+    getBottomYPosition() {
+        return this.bottomBarY;
+    }
+
     render() {
-        const {backHandler, forwardHandler, refreshHandler, onChangeHandler, url} = this.props;
-        return (
-            <View style={styles.bar}>
-                <TouchableOpacity
-                    disabled={!this.state.canGoBack}
-                    style={styles.barButton}
-                    onPress={ () => {
-                        backHandler();
-                    }
-                }>
-                    <Image source={require('./back.png')} style={[styles.arrow, !this.state.canGoBack ? styles.disabled : null]}/>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    disabled={!this.state.canGoForward}
-                    style={styles.barButton}
-                    onPress={ () => {
-                        forwardHandler();
-                    }
-                }>
-                    <Image source={require('./forward.png')} style={[styles.arrow, !this.state.canGoForward ? styles.disabled : null]}/>
-                </TouchableOpacity>
-                <TextInput
-                    ref='textInput'
-                    style={styles.url}
-                    selectTextOnFocus={true}
-                    onChangeText={ (text) => {
-                        this.setState({
-                            url: text
-                        });
-                    }}
-                    onSubmitEditing={ () => {
-                        onChangeHandler(this.formattedURL());
-                    }}
-                    value={this.state.url}
-                    editable={true}
-                    autoCorrect={false}
-                    autoCapitalize='none'
-                    returnKeyType='go'
-                    underlineColorAndroid='transparent'
-                    keyboardType={Platform.OS === 'ios' ? 'web-search' : 'default'}
-                />
-                <TouchableOpacity
-                    style={styles.barButton}
-                    onPress={ () => {
-                        refreshHandler();
-                    }
-                }>
-                    <Image source={require('./refresh.png')} style={styles.refresh}/>
-                </TouchableOpacity>
-            </View>
-        );
+        const {backHandler, forwardHandler, refreshHandler, onChangeHandler, onMenuPressed, url} = this.props;
+          return (
+              <View style={styles.bar} onLayout={this.onLayout}>
+                  <TouchableOpacity
+                      disabled={!this.state.canGoBack}
+                      style={styles.barButton}
+                      onPress={ () => {
+                          backHandler();
+                      }
+                  }>
+                      <Image source={require('./back.png')} style={[styles.arrow, !this.state.canGoBack ? styles.disabled : null]}/>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                      disabled={!this.state.canGoForward}
+                      style={styles.barButton}
+                      onPress={ () => {
+                          forwardHandler();
+                      }
+                  }>
+                      <Image source={require('./forward.png')} style={[styles.arrow, !this.state.canGoForward ? styles.disabled : null]}/>
+                  </TouchableOpacity>
+                  <TextInput
+                      ref='textInput'
+                      style={styles.url}
+                      selectTextOnFocus={true}
+                      onChangeText={ (text) => {
+                          this.setState({
+                              url: text
+                          });
+                      }}
+                      onSubmitEditing={ () => {
+                          onChangeHandler(this.formattedURL());
+                      }}
+                      value={this.state.url}
+                      editable={true}
+                      autoCorrect={false}
+                      autoCapitalize='none'
+                      returnKeyType='go'
+                      underlineColorAndroid='transparent'
+                      keyboardType={Platform.OS === 'ios' ? 'web-search' : 'default'}
+                  />
+                  <TouchableOpacity
+                      style={styles.barButton}
+                      onPress={ () => {
+                          refreshHandler();
+                      }
+                  }>
+                      <Image source={require('./refresh.png')} style={styles.refresh}/>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                      style={styles.barButton}
+                      onPress={onMenuPressed}
+                  >
+                      <Image source={require('./menu.png')} style={styles.refresh}/>
+                  </TouchableOpacity>
+              </View>
+          );
     }
 }
 

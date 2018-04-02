@@ -33,6 +33,8 @@ export function getCategoryForString(str, idToken, callback) {
 
     fetch(url).then(function(response) {
         callback(response._bodyText);
+    }).catch(error => {
+        //console.log(error);
     });
 }
 
@@ -77,6 +79,8 @@ export function getCategoryForHtmlElement(element, idToken, callback) {
 
         fetch(url).then(function(response) {
             callback(response._bodyText);
+        }).catch(error => {
+            //console.log(error);
         });
     }
 }
@@ -99,5 +103,7 @@ export function addTextToCategory(text, category, idToken) {
 
     fetch(url, requestData).then(function(response) {
         callback(response._bodyText);
+    }).catch(error => {
+        //console.log(error);
     });
 }
