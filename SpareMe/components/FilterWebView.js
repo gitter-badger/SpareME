@@ -1,6 +1,6 @@
 'use strict';
 import React from 'react';
-import { StyleSheet, WebView } from 'react-native';
+import { StyleSheet, WebView, Button, TouchableOpacity, Icon, View } from 'react-native';
 import * as api from 'ml-api'
 import * as constants from 'constants'
 import { injectedJS } from './injected.js'
@@ -8,6 +8,9 @@ import { injectedJS } from './injected.js'
 export default class FilterWebView extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            showFlagButton: false
+        }
         this.postMessage = this.postMessage.bind(this);
     }
 
@@ -20,15 +23,15 @@ export default class FilterWebView extends React.Component {
     }
 
     /**
-     * Sends a message from React Native to the WebView
-     */
+    * Sends a message from React Native to the WebView
+    */
     postMessage(action) {
         this.refs.webView.postMessage(JSON.stringify(action));
     }
 
     /**
-     * Handles data passed from the WebView to React
-     */
+    * Handles data passed from the WebView to React
+    */
     onMessage(data) {
         let jsonData;
         try {
@@ -46,8 +49,9 @@ export default class FilterWebView extends React.Component {
             case 'hide':
                 console.log("adding new text to the API!");
                 api.addTextToCategory(jsonData['text'], jsonData['category'],
-                    this.props.idToken);
+                this.props.idToken);
                 break;
+
             case 'predict':
                 let predictionBatch = jsonData['content'];
 
@@ -74,51 +78,81 @@ export default class FilterWebView extends React.Component {
                             console.log(error)
                         }
                     })
-                break;
+                    break;
 
                 case 'selectionChanged':
                     let selection = jsonData['content']
                     console.log("selection changed to: " + selection)
+
+                    if (!this.state.showFlagButton) {
+                        this.setState({
+                            showFlagButton: true
+                        })
+                    }
                     break;
 
                 case 'selectionEnded':
                     console.log("selection ended");
-                    break;
 
-            default:
+                    if (this.state.showFlagButton) {
+                        this.setState({
+                            showFlagButton: false
+                        })
+                    }
+
+                break;
+
+                default:
                 /* Message contains either no known messageType or the message
                 is not a JSON object. */
+            }
         }
-    }
 
-    refresh() {
-        this.refs.webView.reload();
-    }
+        refresh() {
+            this.refs.webView.reload();
+        }
 
-    goBack() {
-        this.refs.webView.goBack();
-    }
+        goBack() {
+            this.refs.webView.goBack();
+        }
 
-    goForward() {
-        this.refs.webView.goForward();
-    }
+        goForward() {
+            this.refs.webView.goForward();
+        }
 
-    render() {
-        return (
-            <WebView
-                {...this.props}
-                ref='webView'
-                injectedJavaScript={injectedJS}
-                style = {styles.web}
-                onMessage={e => this.onMessage(e.nativeEvent.data)}
-            />
-        )
-    }
-}
+        render() {
+            return (
+                <View style={styles.web}>
+                    <WebView
+                        {...this.props}
+                        ref='webView'
+                        injectedJavaScript={injectedJS}
+                        onMessage={e => this.onMessage(e.nativeEvent.data)}/>
+                    <View
+                        style={{display: this.state.showFlagButton ? 'flex' : 'none' }}>
+                        <TouchableOpacity style={styles.flagButtonWrapper}>
+                            <Button title="Flag" style={{}} />
+                        </TouchableOpacity>
+                    </View>
 
-const styles = StyleSheet.create({
-    web: {
-        flex: 1,
-        backgroundColor: '#fff'
-    }
-});
+                    </View>
+                )
+            }
+        }
+
+        const styles = StyleSheet.create({
+            flagButtonWrapper: {
+                borderWidth:1,
+                borderColor:'rgba(0,0,0,0.2)',
+                alignItems:'center',
+                justifyContent:'center',
+                width:100,
+                height:100,
+                backgroundColor:'#fff',
+                borderRadius:100,
+            },
+            web: {
+                flex: 1,
+                backgroundColor: '#fff'
+            }
+        });
