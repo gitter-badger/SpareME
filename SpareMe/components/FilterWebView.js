@@ -76,6 +76,15 @@ export default class FilterWebView extends React.Component {
                     })
                 break;
 
+                case 'selectionChanged':
+                    let selection = jsonData['content']
+                    console.log("selection changed to: " + selection)
+                    break;
+
+                case 'selectionEnded':
+                    console.log("selection ended");
+                    break;
+
             default:
                 /* Message contains either no known messageType or the message
                 is not a JSON object. */

@@ -2,9 +2,14 @@
  * Self-executing function to inject into the WebView
  */
 export const injectedJS = `(${String(function() {
+    // Injected classnames
     const INJECTED_CLASSNAME = "SpareMeElement";
-    const HTTP_BATCH_SIZE = 25
+    const HIDDEN_CLASSNAME = "SpareMeHidden";
+    const REVEALED_CLASSNAME = "SpareMeRevealed";
+
     var injectedClassCounter = 0;
+
+    const HTTP_BATCH_SIZE = 25
 
     inject();
 
@@ -12,6 +17,7 @@ export const injectedJS = `(${String(function() {
         // Open two-way message channel between React and the WebView
         createMessageSender();
         document.addEventListener('message', onReactMessage);
+        document.addEventListener("selectionchange", onSelection, false);
 
         // Send tags to React for processing
         analyzePage();
@@ -46,7 +52,7 @@ export const injectedJS = `(${String(function() {
     }
 
     function hideElement(element) {
-        element.classList.add('SpareMeHidden');
+        element.classList.add(HIDDEN_CLASSNAME);
         element.style.filter = 'blur(10px)';
         element.addEventListener('click', onHiddenElementClick(element));
     }
@@ -61,11 +67,41 @@ export const injectedJS = `(${String(function() {
                 event.preventDefault();
 
                 // Reveal the element
-                element.classList.remove('SpareMeHidden');
-                element.classList.add('SpareMeRevealed');
+                element.classList.remove(HIDDEN_CLASSNAME);
+                element.classList.add(REVEALED_CLASSNAME);
                 element.style.filter = 'blur(0px)';
             }
         }
+    }
+
+    /**
+     * Sends un-hidden text selections to React. 
+     */
+    function onSelection() {
+        let textSelection = window.getSelection();
+
+        if (textSelection == "") {
+            console.log("selectionEnded")
+            window.postMessage(JSON.stringify({
+                messageType: 'selectionEnded'
+            }));
+            return;
+        }
+
+        let selectedHTMLElement = textSelection.anchorNode.parentElement
+
+        // Dismiss already-hidden elements
+        if (selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME) ||
+            selectedHTMLElement.classList.contains(REVEALED_CLASSNAME)) {
+            console.log("selected hidden element");
+            return;
+        }
+
+        window.postMessage(JSON.stringify({
+            messageType: 'selectionChanged',
+            content : window.getSelection().toString()
+        }));
+
     }
 
     function analyzePage() {
@@ -92,7 +128,7 @@ export const injectedJS = `(${String(function() {
                 predictionGroup = {}
             }
 
-            element.addEventListener('click', onPageElementClick(element));
+            // element.addEventListener('click', onPageElementClick(element));
         }
     }
 
@@ -109,8 +145,7 @@ export const injectedJS = `(${String(function() {
                 // Alert React that an element was selected
                 window.postMessage(JSON.stringify({
                     messageType: 'hide',
-                    text : String(element.tagName === 'img' ? element.alt : element.innerText),
-                    category: 'hateful' // TODO let user pick category 
+                    text : String(element.tagName === 'img' ? element.alt : element.innerText)
                 }));
 
                 hideElement(element);
@@ -119,11 +154,11 @@ export const injectedJS = `(${String(function() {
     }
 
     function isHidden(element) {
-        return element.classList.contains('SpareMeHidden');
+        return element.classList.contains(HIDDEN_CLASSNAME);
     }
 
     function isRevealed(element) {
-        return element.classList.contains('SpareMeRevealed');
+        return element.classList.contains(REVEALED_CLASSNAME);
     }
 
 })})();` // JavaScript :)
