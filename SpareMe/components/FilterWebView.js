@@ -47,7 +47,7 @@ export default class FilterWebView extends React.Component {
         console.log("got message type: " + messageType);
 
         switch(messageType) {
-            case 'hide':
+            case 'addTextToAPI':
                 console.log("adding new text to the API!");
                 api.addTextToCategory(jsonData['text'], jsonData['category'],
                 this.props.idToken);
@@ -109,6 +109,17 @@ export default class FilterWebView extends React.Component {
         }
     }
 
+    onFlagButtonPress() {
+        console.log("flag button pressed");
+        this.postMessage({
+            name: 'selectionFlagged'
+        });
+    }
+
+    onUnflagButtonPress() {
+        console.log("unflag button pressed");
+    }
+
     refresh() {
         this.refs.webView.reload();
     }
@@ -130,11 +141,11 @@ export default class FilterWebView extends React.Component {
                     injectedJavaScript={injectedJS}
                     onMessage={e => this.onMessage(e.nativeEvent.data)}/>
                 {this.state.showFlagButton ? (
-                    <TouchableOpacity style={styles.flagButton}>
+                    <TouchableOpacity style={styles.flagButton} onPress={() => this.onFlagButtonPress()}>
                         <Image source={require('./invisible.png')} style={styles.image}/>
                     </TouchableOpacity>
                 ) : (this.state.showUnflagButton ? (
-                    <TouchableOpacity style={styles.flagButton}>
+                    <TouchableOpacity style={styles.flagButton} onPress={() => this.onUnflagButtonPress()}>
                         <Image source={require('./visible.png')} style={styles.image}/>
                     </TouchableOpacity>
                 ) : null)   }
