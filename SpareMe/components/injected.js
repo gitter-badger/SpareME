@@ -7,6 +7,9 @@ export const injectedJS = `(${String(function() {
     const HIDDEN_CLASSNAME = "SpareMeHidden";
     const REVEALED_CLASSNAME = "SpareMeRevealed";
 
+    // The default API category
+    const DEFAULT_CATEGORY = 'harmless';
+
     var injectedClassCounter = 0;
 
     const HTTP_BATCH_SIZE = 25
@@ -67,6 +70,29 @@ export const injectedJS = `(${String(function() {
                     }));
                 }
                 break;
+
+            case 'selectionUnflagged':
+                selectedHTMLElement = window.getSelection().anchorNode.parentElement;
+
+                if (selectedHTMLElement) {
+                    // Hide the selected element on the page
+                    revealElement(selectedHTMLElement);
+                    selectedHTMLElement.classList.remove(REVEALED_CLASSNAME);
+
+                    // Alert React that the user hid an element
+                    window.postMessage(JSON.stringify({
+                        messageType: 'addTextToAPI',
+                        text : String(selectedHTMLElement.tagName === 'img' ?
+                            selectedHTMLElement.alt :
+                            selectedHTMLElement.innerText),
+                            category: DEFAULT_CATEGORY
+                    }));
+                }
+                break;
+
+            default:
+                // Unknown message type
+                break;
         }
     }
 
@@ -74,6 +100,12 @@ export const injectedJS = `(${String(function() {
         element.classList.add(HIDDEN_CLASSNAME);
         element.style.filter = 'blur(10px)';
         element.addEventListener('click', onHiddenElementClick(element));
+    }
+
+    function revealElement(element) {
+        element.classList.remove(HIDDEN_CLASSNAME);
+        element.classList.add(REVEALED_CLASSNAME);
+        element.style.filter = 'blur(0px)';
     }
 
     function onHiddenElementClick(element) {
@@ -84,9 +116,7 @@ export const injectedJS = `(${String(function() {
                 event.preventDefault();
 
                 // Reveal the element
-                element.classList.remove(HIDDEN_CLASSNAME);
-                element.classList.add(REVEALED_CLASSNAME);
-                element.style.filter = 'blur(0px)';
+                revealElement(element);
             }
         }
     }
@@ -107,16 +137,13 @@ export const injectedJS = `(${String(function() {
 
         let selectedHTMLElement = textSelection.anchorNode.parentElement
 
-        // Dismiss already-hidden elements
-        if (selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME) ||
-            selectedHTMLElement.classList.contains(REVEALED_CLASSNAME)) {
-            console.log("selected hidden element");
-            return;
-        }
+        var isHiddenElement = selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME) ||
+            selectedHTMLElement.classList.contains(REVEALED_CLASSNAME)
 
         window.postMessage(JSON.stringify({
             messageType: 'selectionChanged',
-            content : window.getSelection().toString()
+            content : window.getSelection().toString(),
+            isHiddenElement: isHiddenElement
         }));
 
     }

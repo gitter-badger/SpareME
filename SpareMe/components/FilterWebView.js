@@ -48,8 +48,9 @@ export default class FilterWebView extends React.Component {
 
         switch(messageType) {
             case 'addTextToAPI':
-                console.log("adding newly-flagged text to the API: " + jsonData['text']);
-                api.addTextToCategory(jsonData['text'], jsonData['category'],
+                console.log("adding newly-flagged text to the API. category: " + jsonData['category'] + " text: " + jsonData['text']);
+                let category = jsonData['category'];
+                api.addTextToCategory(jsonData['text'], category ? category: 'hateful', // TODO let the user pick the category
                 this.props.idToken);
                 break;
 
@@ -82,25 +83,24 @@ export default class FilterWebView extends React.Component {
                     break;
 
             case 'selectionChanged':
-                let selection = jsonData['content']
-                console.log("selection changed to: " + selection)
+                let selection = jsonData['content'];
+                let isHiddenElement = jsonData['isHiddenElement'];
+                console.log("selection changed to: " + selection);
 
-                if (!this.state.showFlagButton) {
-                    this.setState({
-                        showFlagButton: true,
-                        showUnflagButton: false
-                    })
-                }
+                this.setState({
+                    showFlagButton: !isHiddenElement,
+                    showUnflagButton: isHiddenElement
+                });
+
                 break;
 
             case 'selectionEnded':
                 console.log("selection ended");
+                this.setState({
+                    showFlagButton: false,
+                    showUnflagButton: false
+                })
 
-                if (this.state.showFlagButton) {
-                    this.setState({
-                        showFlagButton: false
-                    })
-                }
                 break;
 
             default:
@@ -114,15 +114,21 @@ export default class FilterWebView extends React.Component {
             name: 'selectionFlagged'
         });
 
-        if (this.state.showFlagButton) {
-            this.setState({
-                showFlagButton: false
-            })
-        }
+        this.setState({
+            showFlagButton: false,
+            showUnflagButton: false
+        })
     }
 
     onUnflagButtonPress() {
-        console.log("unflag button pressed");
+        this.postMessage({
+            name: 'selectionUnflagged'
+        });
+
+        this.setState({
+            showFlagButton: false,
+            showUnflagButton: false
+        })
     }
 
     refresh() {
