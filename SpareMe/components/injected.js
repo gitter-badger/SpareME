@@ -44,10 +44,29 @@ export const injectedJS = `(${String(function() {
     function onReactMessage(data) {
         let action = JSON.parse(data.data);
         let name = action['name'];
-        let className = action['className'];
 
-        if (name === 'hide') {
-            hideElement(document.getElementsByClassName(className)[0]);
+        switch (name) {
+            case 'hide':
+                let className = action['className'];
+                hideElement(document.getElementsByClassName(className)[0]);
+                break;
+
+            case 'selectionFlagged':
+                let selectedHTMLElement = window.getSelection().anchorNode.parentElement;
+
+                if (selectedHTMLElement) {
+                    // Hide the selected element on the page
+                    hideElement(selectedHTMLElement);
+
+                    // Alert React that the user hid an element
+                    window.postMessage(JSON.stringify({
+                        messageType: 'addTextToAPI',
+                        text : String(selectedHTMLElement.tagName === 'img' ?
+                            selectedHTMLElement.alt :
+                            selectedHTMLElement.innerText)
+                    }));
+                }
+                break;
         }
     }
 
@@ -59,8 +78,6 @@ export const injectedJS = `(${String(function() {
 
     function onHiddenElementClick(element) {
         return function(event) {
-            console.log("called onHiddenElementClick");
-
             if (isHidden(element)) {
                 /* Element must be revealed before allowing
                 its normal onclick to fire */
@@ -75,7 +92,7 @@ export const injectedJS = `(${String(function() {
     }
 
     /**
-     * Sends un-hidden text selections to React. 
+     * Sends un-hidden text selections to React.
      */
     function onSelection() {
         let textSelection = window.getSelection();
@@ -126,29 +143,6 @@ export const injectedJS = `(${String(function() {
                 }));
 
                 predictionGroup = {}
-            }
-
-            // element.addEventListener('click', onPageElementClick(element));
-        }
-    }
-
-    function onPageElementClick(element) {
-        return function(event) {
-            console.log("called onPageElementClick");
-            console.log("element is hidden: " + isHidden(element))
-            if (!isHidden(element) && !isRevealed(element)) {
-                event.stopPropagation();
-
-                // TODO remove. for testing only
-                element.style.color = 'red';
-
-                // Alert React that an element was selected
-                window.postMessage(JSON.stringify({
-                    messageType: 'hide',
-                    text : String(element.tagName === 'img' ? element.alt : element.innerText)
-                }));
-
-                hideElement(element);
             }
         }
     }

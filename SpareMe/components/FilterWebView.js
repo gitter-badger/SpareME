@@ -46,7 +46,7 @@ export default class FilterWebView extends React.Component {
         console.log("got message type: " + messageType);
 
         switch(messageType) {
-            case 'hide':
+            case 'addTextToAPI':
                 console.log("adding new text to the API!");
                 api.addTextToCategory(jsonData['text'], jsonData['category'],
                 this.props.idToken);
@@ -108,6 +108,13 @@ export default class FilterWebView extends React.Component {
             }
         }
 
+        onFlagButtonPress() {
+            console.log("flag button pressed");
+            this.postMessage({
+                name: 'selectionFlagged'
+            });
+        }
+
         refresh() {
             this.refs.webView.reload();
         }
@@ -127,32 +134,33 @@ export default class FilterWebView extends React.Component {
                         {...this.props}
                         ref='webView'
                         injectedJavaScript={injectedJS}
-                        onMessage={e => this.onMessage(e.nativeEvent.data)}/>
+                        onMessage={e => this.onMessage(e.nativeEvent.data)}
+                    />
                     <View
                         style={{display: this.state.showFlagButton ? 'flex' : 'none' }}>
                         <TouchableOpacity style={styles.flagButtonWrapper}>
-                            <Button title="Flag" style={{}} />
+                            <Button title="Flag" onPress={ () =>
+                                this.onFlagButtonPress()} />
                         </TouchableOpacity>
                     </View>
-
-                    </View>
-                )
-            }
+                </View>
+            )
         }
+    }
 
-        const styles = StyleSheet.create({
-            flagButtonWrapper: {
-                borderWidth:1,
-                borderColor:'rgba(0,0,0,0.2)',
-                alignItems:'center',
-                justifyContent:'center',
-                width:100,
-                height:100,
-                backgroundColor:'#fff',
-                borderRadius:100,
-            },
-            web: {
-                flex: 1,
-                backgroundColor: '#fff'
-            }
-        });
+const styles = StyleSheet.create({
+    flagButtonWrapper: {
+        borderWidth:1,
+        borderColor:'rgba(0,0,0,0.2)',
+        alignItems:'center',
+        justifyContent:'center',
+        width:100,
+        height:100,
+        backgroundColor:'#fff',
+        borderRadius:100,
+    },
+    web: {
+        flex: 1,
+        backgroundColor: '#fff'
+    }
+});
