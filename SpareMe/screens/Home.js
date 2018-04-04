@@ -238,8 +238,7 @@ const styles = StyleSheet.create({
         width: '100%',
         zIndex: 5,
         position: 'absolute'
-    }
-    ,
+    },
     menu: {
         width: '75%',
         bottom: 0,
