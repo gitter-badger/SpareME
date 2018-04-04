@@ -48,7 +48,7 @@ export default class FilterWebView extends React.Component {
 
         switch(messageType) {
             case 'addTextToAPI':
-                console.log("adding new text to the API!");
+                console.log("adding newly-flagged text to the API: " + jsonData['text']);
                 api.addTextToCategory(jsonData['text'], jsonData['category'],
                 this.props.idToken);
                 break;
@@ -110,10 +110,15 @@ export default class FilterWebView extends React.Component {
     }
 
     onFlagButtonPress() {
-        console.log("flag button pressed");
         this.postMessage({
             name: 'selectionFlagged'
         });
+
+        if (this.state.showFlagButton) {
+            this.setState({
+                showFlagButton: false
+            })
+        }
     }
 
     onUnflagButtonPress() {
