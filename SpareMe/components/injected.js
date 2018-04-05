@@ -98,6 +98,14 @@ export const injectedJS = `(${String(function() {
 
     function hideElement(element) {
         element.classList.add(HIDDEN_CLASSNAME);
+
+        // Cascade class down to all children
+        for (var i = 0; i < element.children.length; i++) {
+            // if (element.children.item(i)) {
+            console.log(element.children.item(i));
+            element.children.item(i).classList.add(HIDDEN_CLASSNAME);
+        }
+
         element.style.filter = 'blur(10px)';
         element.style.webkitUserSelect = 'none';
         element.addEventListener('click', onHiddenElementClick(element));
@@ -175,7 +183,7 @@ export const injectedJS = `(${String(function() {
     }
 
     function analyzePage() {
-        var elements = document.body.querySelectorAll('p, a, li, h1, h2, h3, h4');
+        var elements = document.body.querySelectorAll('p, a, li, h1, h2, h3, h4, span');
         var predictionGroup = {}
         for (var i = 0; i < elements.length; i++) {
             var element = elements[i]
