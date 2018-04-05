@@ -118,7 +118,7 @@ export const injectedJS = `(${String(function() {
     function revealElement(element) {
         element.classList.remove(HIDDEN_CLASSNAME);
         element.classList.add(REVEALED_CLASSNAME);
-        element.style.webkitUserSelect = 'all';
+        element.style.webkitUserSelect = 'auto';
         element.style.filter = 'blur(0px)';
     }
 
@@ -173,9 +173,9 @@ export const injectedJS = `(${String(function() {
             return;
         }
 
-        let selectedHTMLElement = textSelection.anchorNode.parentElement
+        let selectedHTMLElement = textSelection.anchorNode.parentElement;
         var isHiddenElement = selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME) ||
-            selectedHTMLElement.classList.contains(REVEALED_CLASSNAME)
+            selectedHTMLElement.classList.contains(REVEALED_CLASSNAME);
 
         window.postMessage(JSON.stringify({
             messageType: 'selectionChanged',
@@ -186,7 +186,7 @@ export const injectedJS = `(${String(function() {
 
     function analyzePage() {
         var elements = document.body.querySelectorAll('p, a, li, h1, h2, h3, h4, span, div');
-        var predictionGroup = {}
+        var predictionGroup = {};
         for (var i = 0; i < elements.length; i++) {
             var element = elements[i]
 
