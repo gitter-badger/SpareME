@@ -104,8 +104,8 @@ export default class FilterWebView extends React.Component {
                 break;
 
             default:
-            /* Message contains either no known messageType or the message
-            is not a JSON object. */
+                /* Message contains either no known messageType or the message
+                is not a JSON object. */
         }
     }
 
@@ -163,34 +163,34 @@ export default class FilterWebView extends React.Component {
                     </TouchableOpacity>
                 ) : null)   }
             </View>
-            )
-        }
+        )
     }
+}
 
-        const styles = StyleSheet.create({
-            flagButton: {
-                backgroundColor: constants.COLOR_MAIN,
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 74,
-                width: 74,
-                borderRadius: 37,
-                bottom: 20,
-                right: 20,
-                zIndex: 1,
-                position: 'absolute'
-            },
-            flagButtonText: {
-                color: 'white',
-                fontSize: 15
-            },
-            image: {
-                height: 30,
-                aspectRatio: 1,
-                resizeMode: 'contain'
-            },
-            web: {
-                flex: 1,
-                backgroundColor: '#fff'
-            }
-        });
+const styles = StyleSheet.create({
+    flagButton: {
+        backgroundColor: constants.COLOR_MAIN,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 74,
+        width: 74,
+        borderRadius: 37,
+        bottom: 20,
+        right: 20,
+        zIndex: 1,
+        position: 'absolute'
+    },
+    flagButtonText: {
+        color: 'white',
+        fontSize: 15
+    },
+    image: {
+        height: 30,
+        aspectRatio: 1,
+        resizeMode: 'contain'
+    },
+    web: {
+        flex: 1,
+        backgroundColor: '#fff'
+    }
+});

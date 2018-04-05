@@ -172,11 +172,10 @@ export const injectedJS = `(${String(function() {
             content : window.getSelection().toString(),
             isHiddenElement: isHiddenElement
         }));
-
     }
 
     function analyzePage() {
-        var elements = document.body.querySelectorAll('p, a, li');
+        var elements = document.body.querySelectorAll('p, a, li, h1, h2, h3, h4');
         var predictionGroup = {}
         for (var i = 0; i < elements.length; i++) {
             var element = elements[i]
