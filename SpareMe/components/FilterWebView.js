@@ -1,6 +1,6 @@
 'use strict';
 import React from 'react';
-import { StyleSheet, WebView, TouchableOpacity, Icon, View, Image } from 'react-native';
+import { StyleSheet, WebView, TouchableOpacity, Icon, View, Image, Text } from 'react-native';
 import * as api from 'ml-api'
 import * as constants from 'constants'
 import { injectedJS } from './injected.js'
@@ -154,10 +154,12 @@ export default class FilterWebView extends React.Component {
                 {this.state.showFlagButton ? (
                     <TouchableOpacity style={styles.flagButton} onPress={() => this.onFlagButtonPress()}>
                         <Image source={require('./invisible.png')} style={styles.image}/>
+                        <Text style={styles.flagButtonText}>Flag</Text>
                     </TouchableOpacity>
                 ) : (this.state.showUnflagButton ? (
                     <TouchableOpacity style={styles.flagButton} onPress={() => this.onUnflagButtonPress()}>
                         <Image source={require('./visible.png')} style={styles.image}/>
+                        <Text style={styles.flagButtonText}>Unflag</Text>
                     </TouchableOpacity>
                 ) : null)   }
             </View>
@@ -177,6 +179,10 @@ export default class FilterWebView extends React.Component {
                 right: 20,
                 zIndex: 1,
                 position: 'absolute'
+            },
+            flagButtonText: {
+                color: 'white',
+                fontSize: 15
             },
             image: {
                 height: 30,
