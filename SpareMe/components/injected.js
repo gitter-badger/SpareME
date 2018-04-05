@@ -99,13 +99,41 @@ export const injectedJS = `(${String(function() {
     function hideElement(element) {
         element.classList.add(HIDDEN_CLASSNAME);
         element.style.filter = 'blur(10px)';
+        element.style.webkitUserSelect = 'none';
         element.addEventListener('click', onHiddenElementClick(element));
+        configureLongPressActions(element)
     }
 
     function revealElement(element) {
         element.classList.remove(HIDDEN_CLASSNAME);
         element.classList.add(REVEALED_CLASSNAME);
+        element.style.webkitUserSelect = 'all';
         element.style.filter = 'blur(0px)';
+    }
+
+    function configureLongPressActions(node) {
+        var longpress = false;
+        var presstimer = null;
+
+        var cancel = function(e) {
+            if (presstimer !== null) {
+                clearTimeout(presstimer);
+                presstimer = null;
+            }
+        };
+
+        var start = function(e) {
+            longpress = false;
+            presstimer = setTimeout(function() {
+                revealElement(node)
+                longpress = true;
+            }, 500);
+        };
+
+        node.addEventListener("touchstart", start);
+        node.addEventListener("touchend", cancel);
+        node.addEventListener("touchleave", cancel);
+        node.addEventListener("touchcancel", cancel);
     }
 
     function onHiddenElementClick(element) {
@@ -136,7 +164,6 @@ export const injectedJS = `(${String(function() {
         }
 
         let selectedHTMLElement = textSelection.anchorNode.parentElement
-
         var isHiddenElement = selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME) ||
             selectedHTMLElement.classList.contains(REVEALED_CLASSNAME)
 
