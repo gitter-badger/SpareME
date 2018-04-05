@@ -1,0 +1,6 @@
+__label__fruit banana tomato apple
+__label__soda coke pepsi dr pepper
+__label__evil travis sells data
+__label__fruit a banana is a fruit
+__label__evil selling data is evil
+__label__soda coke is a type of soda
