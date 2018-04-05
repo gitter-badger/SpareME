@@ -51,7 +51,12 @@ export const injectedJS = `(${String(function() {
         switch (name) {
             case 'hide':
                 let className = action['className'];
-                hideElement(document.getElementsByClassName(className)[0]);
+                var element = document.getElementsByClassName(className)[0];
+
+                // Only hide elements once :D
+                if (!isHidden(element) && !isRevealed(element)) {
+                    hideElement(element);
+                }
                 break;
 
             case 'selectionFlagged':
@@ -101,8 +106,6 @@ export const injectedJS = `(${String(function() {
 
         // Cascade class down to all children
         for (var i = 0; i < element.children.length; i++) {
-            // if (element.children.item(i)) {
-            console.log(element.children.item(i));
             element.children.item(i).classList.add(HIDDEN_CLASSNAME);
         }
 
@@ -164,7 +167,6 @@ export const injectedJS = `(${String(function() {
         let textSelection = window.getSelection();
 
         if (textSelection == "") {
-            console.log("selectionEnded")
             window.postMessage(JSON.stringify({
                 messageType: 'selectionEnded'
             }));
@@ -183,10 +185,19 @@ export const injectedJS = `(${String(function() {
     }
 
     function analyzePage() {
-        var elements = document.body.querySelectorAll('p, a, li, h1, h2, h3, h4, span');
+        var elements = document.body.querySelectorAll('p, a, li, h1, h2, h3, h4, span, div');
         var predictionGroup = {}
         for (var i = 0; i < elements.length; i++) {
             var element = elements[i]
+
+            // Discard divs and spans that wrap other HTML elements
+            if (element.tagName === "SPAN" || element.tagName === "DIV") {
+                if (element.childElementCount != 0) {
+                    continue;
+                } else {
+                    console.log("Found non-empty div/span");
+                }
+            }
 
             // Add unique class so we can find this element later
             let addedClass = INJECTED_CLASSNAME + injectedClassCounter;
