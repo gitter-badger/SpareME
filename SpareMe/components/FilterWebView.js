@@ -9,10 +9,6 @@ import BottomButtonBar from './BottomButtonBar.js'
 export default class FilterWebView extends React.Component {
     constructor(props) {
         super(props);
-        this.postMessage = this.postMessage.bind(this);
-        this.onFlagCategoryButtonPress = this.onFlagCategoryButtonPress.bind(this);
-        this.onUnflagButtonPress = this.onUnflagButtonPress.bind(this);
-        this.removeFullscreen = this.removeFullscreen.bind(this);
 
         this.state = {
             showFullscreenOpacity: false
@@ -30,7 +26,7 @@ export default class FilterWebView extends React.Component {
     /**
     * Sends a message from React Native to the WebView
     */
-    postMessage(action) {
+    postMessage = (action) => {
         this.refs.webView.postMessage(JSON.stringify(action));
     }
 
@@ -83,7 +79,7 @@ export default class FilterWebView extends React.Component {
                         } catch (error) {
                             console.log(error)
                         }
-                    })
+                    });
                     break;
 
             case 'selectionChanged':
@@ -115,12 +111,10 @@ export default class FilterWebView extends React.Component {
                     showFullscreenOpacity: true
                 })
 
-
                 break;
 
             default:
-                /* Message contains either no known messageType or the message
-                is not a JSON object. */
+                /* Unknown message type */
         }
     }
 
@@ -136,7 +130,7 @@ export default class FilterWebView extends React.Component {
         this.refs.webView.goForward();
     }
 
-    onFlagCategoryButtonPress(category) {
+    onFlagCategoryButtonPress = (category) => {
         this.postMessage({
             name: 'selectionFlagged',
             category: category
@@ -147,7 +141,7 @@ export default class FilterWebView extends React.Component {
         });
     }
 
-    onUnflagButtonPress() {
+    onUnflagButtonPress = () => {
         this.postMessage({
             name: 'selectionUnflagged'
         });
@@ -162,13 +156,19 @@ export default class FilterWebView extends React.Component {
         });
     }
 
-    removeFullscreen() {
-        console.log('called removefullscreen;');
-        console.log(this);
-        this.postMessage({
-            name: 'unflagIgnored'
-        });
-        this.refs.buttonBar.setState({showUnflagButton: false});
+    removeFullscreen = () => {
+        console.log('called removefullscreen');
+        let removeCategories = this.refs.buttonBar.state.showCategories;
+
+        if (removeCategories) {
+            this.refs.buttonBar.setState({showCategories: false});
+        } else { /* remove unflag button */
+            this.refs.buttonBar.setState({showUnflagButton: false});
+            this.postMessage({
+                name: 'unflagIgnored'
+            });
+        }
+
         this.setState({showFullscreenOpacity: false});
     }
 
@@ -177,12 +177,13 @@ export default class FilterWebView extends React.Component {
         if (!webState.url.includes('react-js-navigation://postMessage')) {
             this.refs.buttonBar.setState({
                 showFlagButton: false,
-                showUnflagButton: false
+                showUnflagButton: false,
+                showCategories: false
             });
 
             this.setState({
                 showFullscreenOpacity: false
-            })
+            });
         }
     }
 
@@ -194,9 +195,11 @@ export default class FilterWebView extends React.Component {
                     ref='webView'
                     injectedJavaScript={injectedJS}
                     onNavigationStateChange={this.navChangeHandler}
-                    onMessage={e => this.onMessage(e.nativeEvent.data)}/>
+                    onMessage={e => this.onMessage(e.nativeEvent.data)}
+                />
                     { this.state.showFullscreenOpacity ?
-                        (<TouchableOpacity style={styles.fullscreen} onPress={this.removeFullscreen} />) : null
+                        (<TouchableOpacity style={styles.fullscreen}
+                            onPress={this.removeFullscreen} />) : null
                     }
 
                 <BottomButtonBar ref="buttonBar" webView={this} style={{zIndex: 2}}/>

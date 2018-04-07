@@ -21,11 +21,14 @@ export default class ButtonButtonBar extends React.Component {
     }
 
     showCategories() {
-        console.log("showing categories starting with: " + this.state.categories[0]);
         this.setState({
             showFlagButton: false,
             showUnflagButton: false,
             showCategories: true
+        });
+
+        this.props.webView.setState({
+            showFullscreenOpacity: true
         })
     }
 
@@ -34,7 +37,8 @@ export default class ButtonButtonBar extends React.Component {
             <View style={styles.buttonBar}>
                 { this.state.showFlagButton ?
                     (
-                        <TouchableOpacity style={styles.flagButton} onPress={() => {this.showCategories()}}>
+                        <TouchableOpacity style={styles.flagButton}
+                            onPress={() => {this.showCategories()}}>
                             <Image source={require('./invisible.png')} style={styles.image}/>
                             <Text style={styles.flagButtonText}>Flag</Text>
                         </TouchableOpacity>
@@ -48,21 +52,25 @@ export default class ButtonButtonBar extends React.Component {
                                 <Text style={styles.flagButtonText}>Unflag</Text>
                             </TouchableOpacity>
                         ) :
-                            null)
+                        null)
                 }
-                { this.state.showCategories &&
-                    <ScrollView
-                        ref='scrollView'
-                        horizontal={true}
-                        pagingEnabled={true}
-                        /* Couldn't figure out how to align the content to the
-                         right, so I'm just animating it for now. */
-                        onContentSizeChange={(contentWidth, contentHeight) => {
-                            this.refs.scrollView.scrollToEnd({animated: true});}}>
+                { this.state.showCategories ?
+                    (
+                        <ScrollView
+                            ref='scrollView'
+                            horizontal={true}
+                            pagingEnabled={true}
+                            showsHorizontalScrollIndicator={false}
+                            /* Couldn't figure out how to align the content to the
+                             right, so I'm just animating it for now. */
+                            onContentSizeChange={(contentWidth, contentHeight) => {
+                                this.refs.scrollView.scrollToEnd({animated: true});}}>
                         {
                             this.renderCategoryButtons()
                         }
-                    </ScrollView>
+                        </ScrollView>
+                    ):
+                    null
                 }
 
             </View>
@@ -76,9 +84,11 @@ export default class ButtonButtonBar extends React.Component {
         if (!this.state.categories) return null;
 
         return this.state.categories.map((item, index) => {
-            console.log('rendering: ' + item);
             return (
-                <TouchableOpacity key={'category' + index} style={styles.flagButton} onPress={() => {this.props.webView.onFlagCategoryButtonPress(item)}}>
+                <TouchableOpacity
+                    key={'category' + index}
+                    style={styles.flagButton}
+                    onPress={() => {this.props.webView.onFlagCategoryButtonPress(item)}}>
                     <Text style={styles.flagButtonText}>{item}</Text>
                 </TouchableOpacity>
             );
@@ -88,26 +98,28 @@ export default class ButtonButtonBar extends React.Component {
 
 const styles = StyleSheet.create({
     buttonBar: {
+        bottom: 15,
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-end',
-        bottom: 15,
+        left: 15,
+        position: 'absolute',
         right: 15,
-        position: 'absolute'
     },
     flagButton: {
-        backgroundColor: constants.COLOR_MAIN,
-        justifyContent: 'center',
         alignItems: 'center',
-        height: 74,
-        width: 74,
+        backgroundColor: constants.COLOR_MAIN,
         borderRadius: 37,
+        height: 74,
+        justifyContent: 'center',
         margin: 5,
+        width: 74,
         zIndex: 3
     },
     flagButtonText: {
         color: 'white',
-        fontSize: 15
+        fontSize: 15,
+        textAlign: 'center'
     },
     image: {
         height: 30,
