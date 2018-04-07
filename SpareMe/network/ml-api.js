@@ -104,7 +104,7 @@ export function addTextToCategory(text, category, idToken) {
     fetch(url, requestData).then(function(response) {
         callback(response._bodyText);
     }).catch(error => {
-        //console.log(error);
+        console.log(error);
     });
 }
 
@@ -113,6 +113,6 @@ export function getCategories(callback) {
     fetch("http://google.com/").then(function(response) {
         callback(['harmelss', 'hateful', 'bananas']);
     }).catch(error => {
-        //console.log(error);
+        console.log(error);
     });
 }

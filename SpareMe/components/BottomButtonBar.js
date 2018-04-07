@@ -8,19 +8,16 @@ import { injectedJS } from './injected.js'
 export default class ButtonButtonBar extends React.Component {
     constructor(props) {
         super(props);
-        console.log("webview: " + props.webView);
         this.state = {
             showFlagButton: false,
-            showUnflagButton: false,
-            categories: ['hateful', 'harmless', 'awesome']
+            showUnflagButton: false
         }
 
-        // TODO do this instead of setting categories above
-        // api.getCategories(function(response) {
-        //     this.setState({
-        //         categories: response
-        //     });
-        // });
+        api.getCategories((response) => {
+            this.setState({
+                categories: response
+            });
+        });
     }
 
     showCategories() {
@@ -67,10 +64,9 @@ export default class ButtonButtonBar extends React.Component {
     renderCategoryButtons() {
         if (!this.state.categories) return null;
 
-        var index = 0;
-        return this.state.categories.map((item) => {
+        return this.state.categories.map((item, index) => {
             return (
-                <TouchableOpacity key={'category' + index++} style={styles.flagButton} onPress={() => {this.props.webView.onFlagCategoryButtonPress(item)}}>
+                <TouchableOpacity key={'category' + index} style={styles.flagButton} onPress={() => {this.props.webView.onFlagCategoryButtonPress(item)}}>
                     <Text style={styles.flagButtonText}>{item}</Text>
                 </TouchableOpacity>
             );

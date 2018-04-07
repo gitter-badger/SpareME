@@ -85,7 +85,6 @@ export default class FilterWebView extends React.Component {
                 let selection = jsonData['content'];
                 let isHiddenElement = jsonData['isHiddenElement'];
                 console.log("selection changed to: " + selection);
-                let isLink = jsonData['isLink'];
 
                 this.refs.buttonBar.setState({
                     showFlagButton: !isHiddenElement,
