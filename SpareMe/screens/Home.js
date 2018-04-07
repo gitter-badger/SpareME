@@ -199,7 +199,7 @@ export default class Home extends Component {
                     source={{uri: this.state.url}}
                     idToken={this.state.idToken}
                     javaScriptEnabledAndroid={true}
-                    onNavigationStateChange={this.navChangeHandler}
+                    navChangeHandler={this.navChangeHandler}
                     onError={this.webErrorHandler}
                     renderError={this.renderError}
                     onRef={ref => (this.webView = ref)}/>

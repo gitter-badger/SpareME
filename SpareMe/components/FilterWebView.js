@@ -88,8 +88,7 @@ export default class FilterWebView extends React.Component {
                 console.log("selection changed to: " + selection);
 
                 this.setState({
-                    showFlagButton: !isHiddenElement,
-                    showUnflagButton: isHiddenElement
+                    showFlagButton: !isHiddenElement
                 });
 
                 break;
@@ -97,8 +96,16 @@ export default class FilterWebView extends React.Component {
             case 'selectionEnded':
                 console.log("selection ended");
                 this.setState({
+                    showFlagButton: false
+                })
+
+                break;
+
+            case 'elementRevealed':
+                console.log('elementRevealed');
+                this.setState({
                     showFlagButton: false,
-                    showUnflagButton: false
+                    showUnflagButton: true
                 })
 
                 break;
@@ -128,7 +135,22 @@ export default class FilterWebView extends React.Component {
         this.setState({
             showFlagButton: false,
             showUnflagButton: false
-        })
+        });
+    }
+
+    removeFullscreen = () => {
+        this.postMessage({
+            name: 'unflagIgnored'
+        });
+        this.setState({showUnflagButton: false});
+    }
+
+    navChangeHandler = (webState) => {
+        this.props.navChangeHandler(webState);
+        this.setState({
+            showFlagButton: false,
+            showUnflagButton: false
+        });
     }
 
     refresh() {
@@ -150,7 +172,9 @@ export default class FilterWebView extends React.Component {
                     {...this.props}
                     ref='webView'
                     injectedJavaScript={injectedJS}
+                    onNavigationStateChange={this.navChangeHandler}
                     onMessage={e => this.onMessage(e.nativeEvent.data)}/>
+                {this.state.showUnflagButton ? (<TouchableOpacity style={styles.fullscreen} onPress={this.removeFullscreen} />) : null}
                 {this.state.showFlagButton ? (
                     <TouchableOpacity style={styles.flagButton} onPress={() => this.onFlagButtonPress()}>
                         <Image source={require('./invisible.png')} style={styles.image}/>
@@ -177,7 +201,7 @@ const styles = StyleSheet.create({
         borderRadius: 37,
         bottom: 20,
         right: 20,
-        zIndex: 1,
+        zIndex: 3,
         position: 'absolute'
     },
     flagButtonText: {
@@ -192,5 +216,11 @@ const styles = StyleSheet.create({
     web: {
         flex: 1,
         backgroundColor: '#fff'
+    },
+    fullscreen: {
+        height: '100%',
+        width: '100%',
+        zIndex: 2,
+        position: 'absolute'
     }
 });

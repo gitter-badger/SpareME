@@ -77,22 +77,22 @@ export const injectedJS = `(${String(function() {
                 break;
 
             case 'selectionUnflagged':
-                selectedHTMLElement = window.getSelection().anchorNode.parentElement;
+                var element = window.revealedElement;
+                element.classList.remove(REVEALED_CLASSNAME);
 
-                if (selectedHTMLElement) {
-                    // Hide the selected element on the page
-                    revealElement(selectedHTMLElement);
-                    selectedHTMLElement.classList.remove(REVEALED_CLASSNAME);
+                // Alert React that the user unflagged an element
+                window.postMessage(JSON.stringify({
+                    messageType: 'addTextToAPI',
+                    text : String(element.tagName === 'img' ?
+                        element.alt :
+                        element.innerText),
+                        category: DEFAULT_CATEGORY
+                }));
+                break;
 
-                    // Alert React that the user unhid an element
-                    window.postMessage(JSON.stringify({
-                        messageType: 'addTextToAPI',
-                        text : String(selectedHTMLElement.tagName === 'img' ?
-                            selectedHTMLElement.alt :
-                            selectedHTMLElement.innerText),
-                            category: DEFAULT_CATEGORY
-                    }));
-                }
+            case 'unflagIgnored':
+                var element = window.revealedElement;
+                hideElement(element);
                 break;
 
             default:
@@ -120,6 +120,7 @@ export const injectedJS = `(${String(function() {
         element.classList.add(REVEALED_CLASSNAME);
         element.style.webkitUserSelect = 'auto';
         element.style.filter = 'blur(0px)';
+        window.revealedElement = element;
     }
 
     function configureLongPressActions(node) {
@@ -154,6 +155,10 @@ export const injectedJS = `(${String(function() {
                 its normal onclick to fire */
                 event.preventDefault();
 
+                window.postMessage(JSON.stringify({
+                    messageType: 'elementRevealed'
+                }));
+
                 // Reveal the element
                 revealElement(element);
             }
@@ -174,8 +179,7 @@ export const injectedJS = `(${String(function() {
         }
 
         let selectedHTMLElement = textSelection.anchorNode.parentElement;
-        var isHiddenElement = selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME) ||
-            selectedHTMLElement.classList.contains(REVEALED_CLASSNAME);
+        var isHiddenElement = selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME);
 
         window.postMessage(JSON.stringify({
             messageType: 'selectionChanged',
