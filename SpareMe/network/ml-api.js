@@ -101,9 +101,7 @@ export function addTextToCategory(text, category, idToken) {
         body: form
     }
 
-    fetch(url, requestData).then(function(response) {
-        callback(response._bodyText);
-    }).catch(error => {
+    fetch(url, requestData).catch(error => {
         console.log(error);
     });
 }

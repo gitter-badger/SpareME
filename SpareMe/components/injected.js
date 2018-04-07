@@ -3,9 +3,9 @@
  */
 export const injectedJS = `(${String(function() {
     // Injected classnames
-    const INJECTED_CLASSNAME = "SpareMeElement";
-    const HIDDEN_CLASSNAME = "SpareMeHidden";
-    const REVEALED_CLASSNAME = "SpareMeRevealed";
+    const INJECTED_CLASSNAME = 'SpareMeElement';
+    const HIDDEN_CLASSNAME = 'SpareMeHidden';
+    const REVEALED_CLASSNAME = 'SpareMeRevealed';
 
     // The default API category
     const DEFAULT_CATEGORY = 'harmless';
@@ -20,7 +20,7 @@ export const injectedJS = `(${String(function() {
         // Open two-way message channel between React and the WebView
         createMessageSender();
         document.addEventListener('message', onReactMessage);
-        document.addEventListener("selectionchange", onSelection, false);
+        document.addEventListener('selectionchange', onSelection, false);
 
         // Send tags to React for processing
         analyzePage();
@@ -79,22 +79,22 @@ export const injectedJS = `(${String(function() {
                 break;
 
             case 'selectionUnflagged':
-                selectedHTMLElement = window.getSelection().anchorNode.parentElement;
+                var element = window.revealedElement;
+                element.classList.remove(REVEALED_CLASSNAME);
 
-                if (selectedHTMLElement) {
-                    // Hide the selected element on the page
-                    revealElement(selectedHTMLElement);
-                    selectedHTMLElement.classList.remove(REVEALED_CLASSNAME);
+                // Alert React that the user unflagged an element
+                window.postMessage(JSON.stringify({
+                    messageType: 'addTextToAPI',
+                    text : String(element.tagName === 'img' ?
+                        element.alt :
+                        element.innerText),
+                        category: DEFAULT_CATEGORY
+                }));
+                break;
 
-                    // Alert React that the user hid an element
-                    window.postMessage(JSON.stringify({
-                        messageType: 'addTextToAPI',
-                        text : String(selectedHTMLElement.tagName === 'img' ?
-                            selectedHTMLElement.alt :
-                            selectedHTMLElement.innerText),
-                            category: DEFAULT_CATEGORY
-                    }));
-                }
+            case 'unflagIgnored':
+                var element = window.revealedElement;
+                hideElement(element);
                 break;
 
             default:
@@ -122,6 +122,7 @@ export const injectedJS = `(${String(function() {
         element.classList.add(REVEALED_CLASSNAME);
         element.style.webkitUserSelect = 'auto';
         element.style.filter = 'blur(0px)';
+        window.revealedElement = element;
     }
 
     function configureLongPressActions(node) {
@@ -143,10 +144,10 @@ export const injectedJS = `(${String(function() {
             }, 500);
         };
 
-        node.addEventListener("touchstart", start);
-        node.addEventListener("touchend", cancel);
-        node.addEventListener("touchleave", cancel);
-        node.addEventListener("touchcancel", cancel);
+        node.addEventListener('touchstart', start);
+        node.addEventListener('touchend', cancel);
+        node.addEventListener('touchleave', cancel);
+        node.addEventListener('touchcancel', cancel);
     }
 
     function onHiddenElementClick(element) {
@@ -155,6 +156,10 @@ export const injectedJS = `(${String(function() {
                 /* Element must be revealed before allowing
                 its normal onclick to fire */
                 event.preventDefault();
+
+                window.postMessage(JSON.stringify({
+                    messageType: 'elementRevealed'
+                }));
 
                 // Reveal the element
                 revealElement(element);
@@ -168,7 +173,7 @@ export const injectedJS = `(${String(function() {
     function onSelection() {
         let textSelection = window.getSelection();
 
-        if (textSelection == "") {
+        if (textSelection == '') {
             window.postMessage(JSON.stringify({
                 messageType: 'selectionEnded'
             }));
@@ -176,8 +181,7 @@ export const injectedJS = `(${String(function() {
         }
 
         let selectedHTMLElement = textSelection.anchorNode.parentElement;
-        var isHiddenElement = selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME) ||
-            selectedHTMLElement.classList.contains(REVEALED_CLASSNAME);
+        var isHiddenElement = selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME);
 
         window.postMessage(JSON.stringify({
             messageType: 'selectionChanged',
@@ -193,11 +197,11 @@ export const injectedJS = `(${String(function() {
             var element = elements[i]
 
             // Discard divs and spans that wrap other HTML elements
-            if (element.tagName === "SPAN" || element.tagName === "DIV") {
+            if (element.tagName === 'SPAN' || element.tagName === 'DIV') {
                 if (element.childElementCount != 0) {
                     continue;
                 } else {
-                    console.log("Found non-empty div/span");
+                    console.log('Found non-empty div/span');
                 }
             }
 

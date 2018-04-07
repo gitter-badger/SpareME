@@ -21,6 +21,7 @@ export default class ButtonButtonBar extends React.Component {
     }
 
     showCategories() {
+        console.log("showing categories starting with: " + this.state.categories[0]);
         this.setState({
             showFlagButton: false,
             showUnflagButton: false,
@@ -63,6 +64,7 @@ export default class ButtonButtonBar extends React.Component {
                         }
                     </ScrollView>
                 }
+
             </View>
         );
     }
@@ -74,6 +76,7 @@ export default class ButtonButtonBar extends React.Component {
         if (!this.state.categories) return null;
 
         return this.state.categories.map((item, index) => {
+            console.log('rendering: ' + item);
             return (
                 <TouchableOpacity key={'category' + index} style={styles.flagButton} onPress={() => {this.props.webView.onFlagCategoryButtonPress(item)}}>
                     <Text style={styles.flagButtonText}>{item}</Text>
@@ -100,7 +103,7 @@ const styles = StyleSheet.create({
         width: 74,
         borderRadius: 37,
         margin: 5,
-        zIndex: 1
+        zIndex: 3
     },
     flagButtonText: {
         color: 'white',

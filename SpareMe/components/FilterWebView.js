@@ -12,6 +12,11 @@ export default class FilterWebView extends React.Component {
         this.postMessage = this.postMessage.bind(this);
         this.onFlagCategoryButtonPress = this.onFlagCategoryButtonPress.bind(this);
         this.onUnflagButtonPress = this.onUnflagButtonPress.bind(this);
+        this.removeFullscreen = this.removeFullscreen.bind(this);
+
+        this.state = {
+            showFullscreenOpacity: false
+        }
     }
 
     componentDidMount() {
@@ -85,11 +90,8 @@ export default class FilterWebView extends React.Component {
                 let selection = jsonData['content'];
                 let isHiddenElement = jsonData['isHiddenElement'];
                 console.log("selection changed to: " + selection);
-
                 this.refs.buttonBar.setState({
-                    showFlagButton: !isHiddenElement,
-                    showUnflagButton: isHiddenElement,
-                    showCategories: false
+                    showFlagButton: !isHiddenElement
                 });
 
                 break;
@@ -97,10 +99,22 @@ export default class FilterWebView extends React.Component {
             case 'selectionEnded':
                 console.log("selection ended");
                 this.refs.buttonBar.setState({
-                    showFlagButton: false,
-                    showUnflagButton: false,
-                    showCategories: false
+                    showFlagButton: false
                 })
+
+                break;
+
+            case 'elementRevealed':
+                console.log('elementRevealed');
+                this.refs.buttonBar.setState({
+                    showFlagButton: false,
+                    showUnflagButton: true
+                });
+
+                this.setState({
+                    showFullscreenOpacity: true
+                })
+
 
                 break;
 
@@ -141,7 +155,35 @@ export default class FilterWebView extends React.Component {
         this.refs.buttonBar.setState({
             showFlagButton: false,
             showUnflagButton: false
-        })
+        });
+
+        this.setState({
+            showFullscreenOpacity: false
+        });
+    }
+
+    removeFullscreen() {
+        console.log('called removefullscreen;');
+        console.log(this);
+        this.postMessage({
+            name: 'unflagIgnored'
+        });
+        this.refs.buttonBar.setState({showUnflagButton: false});
+        this.setState({showFullscreenOpacity: false});
+    }
+
+    navChangeHandler = (webState) => {
+        this.props.navChangeHandler(webState);
+        if (!webState.url.includes('react-js-navigation://postMessage')) {
+            this.refs.buttonBar.setState({
+                showFlagButton: false,
+                showUnflagButton: false
+            });
+
+            this.setState({
+                showFullscreenOpacity: false
+            })
+        }
     }
 
     render() {
@@ -151,8 +193,13 @@ export default class FilterWebView extends React.Component {
                     {...this.props}
                     ref='webView'
                     injectedJavaScript={injectedJS}
+                    onNavigationStateChange={this.navChangeHandler}
                     onMessage={e => this.onMessage(e.nativeEvent.data)}/>
-                <BottomButtonBar ref="buttonBar" webView={this}/>
+                    { this.state.showFullscreenOpacity ?
+                        (<TouchableOpacity style={styles.fullscreen} onPress={this.removeFullscreen} />) : null
+                    }
+
+                <BottomButtonBar ref="buttonBar" webView={this} style={{zIndex: 2}}/>
             </View>
         )
     }
@@ -162,5 +209,10 @@ const styles = StyleSheet.create({
     web: {
         flex: 1,
         backgroundColor: '#fff'
+    },
+    fullscreen: {
+        height: '100%',
+        width: '100%',
+        position: 'absolute'
     }
 });

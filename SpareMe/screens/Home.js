@@ -199,7 +199,7 @@ export default class Home extends Component {
                     source={{uri: this.state.url}}
                     idToken={this.state.idToken}
                     javaScriptEnabledAndroid={true}
-                    onNavigationStateChange={this.navChangeHandler}
+                    navChangeHandler={this.navChangeHandler}
                     onError={this.webErrorHandler}
                     renderError={this.renderError}
                     onRef={ref => (this.webView = ref)}/>
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     },
     menu: {
         width: '75%',
-        bottom: 0,
+        // height: '50%',
         right: 0,
         zIndex: 10,
         position: 'absolute'
