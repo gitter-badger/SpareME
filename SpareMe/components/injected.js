@@ -3,9 +3,9 @@
  */
 export const injectedJS = `(${String(function() {
     // Injected classnames
-    const INJECTED_CLASSNAME = "SpareMeElement";
-    const HIDDEN_CLASSNAME = "SpareMeHidden";
-    const REVEALED_CLASSNAME = "SpareMeRevealed";
+    const INJECTED_CLASSNAME = 'SpareMeElement';
+    const HIDDEN_CLASSNAME = 'SpareMeHidden';
+    const REVEALED_CLASSNAME = 'SpareMeRevealed';
 
     // The default API category
     const DEFAULT_CATEGORY = 'harmless';
@@ -20,7 +20,7 @@ export const injectedJS = `(${String(function() {
         // Open two-way message channel between React and the WebView
         createMessageSender();
         document.addEventListener('message', onReactMessage);
-        document.addEventListener("selectionchange", onSelection, false);
+        document.addEventListener('selectionchange', onSelection, false);
 
         // Send tags to React for processing
         analyzePage();
@@ -84,7 +84,7 @@ export const injectedJS = `(${String(function() {
                     revealElement(selectedHTMLElement);
                     selectedHTMLElement.classList.remove(REVEALED_CLASSNAME);
 
-                    // Alert React that the user hid an element
+                    // Alert React that the user unhid an element
                     window.postMessage(JSON.stringify({
                         messageType: 'addTextToAPI',
                         text : String(selectedHTMLElement.tagName === 'img' ?
@@ -141,10 +141,10 @@ export const injectedJS = `(${String(function() {
             }, 500);
         };
 
-        node.addEventListener("touchstart", start);
-        node.addEventListener("touchend", cancel);
-        node.addEventListener("touchleave", cancel);
-        node.addEventListener("touchcancel", cancel);
+        node.addEventListener('touchstart', start);
+        node.addEventListener('touchend', cancel);
+        node.addEventListener('touchleave', cancel);
+        node.addEventListener('touchcancel', cancel);
     }
 
     function onHiddenElementClick(element) {
@@ -166,7 +166,7 @@ export const injectedJS = `(${String(function() {
     function onSelection() {
         let textSelection = window.getSelection();
 
-        if (textSelection == "") {
+        if (textSelection == '') {
             window.postMessage(JSON.stringify({
                 messageType: 'selectionEnded'
             }));
@@ -191,11 +191,11 @@ export const injectedJS = `(${String(function() {
             var element = elements[i]
 
             // Discard divs and spans that wrap other HTML elements
-            if (element.tagName === "SPAN" || element.tagName === "DIV") {
+            if (element.tagName === 'SPAN' || element.tagName === 'DIV') {
                 if (element.childElementCount != 0) {
                     continue;
                 } else {
-                    console.log("Found non-empty div/span");
+                    console.log('Found non-empty div/span');
                 }
             }
 
