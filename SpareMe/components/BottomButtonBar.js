@@ -1,6 +1,6 @@
 'use strict';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, Icon, View, Image, Text } from 'react-native';
+import { StyleSheet, ScrollView, TouchableOpacity, Icon, View, Image, Text } from 'react-native';
 import * as api from 'ml-api'
 import * as constants from 'constants'
 import { injectedJS } from './injected.js'
@@ -40,7 +40,9 @@ export default class ButtonButtonBar extends React.Component {
                     ) :
                     ( this.state.showUnflagButton ?
                         (
-                            <TouchableOpacity style={styles.flagButton} onPress={this.props.webView.onUnflagButtonPress}>
+                            <TouchableOpacity
+                                style={styles.flagButton}
+                                onPress={this.props.webView.onUnflagButtonPress}>
                                 <Image source={require('./visible.png')} style={styles.image}/>
                                 <Text style={styles.flagButtonText}>Unflag</Text>
                             </TouchableOpacity>
@@ -48,11 +50,18 @@ export default class ButtonButtonBar extends React.Component {
                             null)
                 }
                 { this.state.showCategories &&
-                    <View style={styles.categoryWrapper}>
+                    <ScrollView
+                        ref='scrollView'
+                        horizontal={true}
+                        pagingEnabled={true}
+                        /* Couldn't figure out how to align the content to the
+                         right, so I'm just animating it for now. */
+                        onContentSizeChange={(contentWidth, contentHeight) => {
+                            this.refs.scrollView.scrollToEnd({animated: true});}}>
                         {
                             this.renderCategoryButtons()
                         }
-                    </View>
+                    </ScrollView>
                 }
             </View>
         );
@@ -82,11 +91,6 @@ const styles = StyleSheet.create({
         bottom: 15,
         right: 15,
         position: 'absolute'
-    },
-    categoryWrapper: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'flex-end'
     },
     flagButton: {
         backgroundColor: constants.COLOR_MAIN,

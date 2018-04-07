@@ -111,7 +111,7 @@ export function addTextToCategory(text, category, idToken) {
 export function getCategories(callback) {
     // TODO get these from the API
     fetch("http://google.com/").then(function(response) {
-        callback(['harmelss', 'hateful', 'bananas']);
+        callback(['harmelss', 'hateful', 'bananas', 'test', 'hokies', 'hello world']);
     }).catch(error => {
         console.log(error);
     });
