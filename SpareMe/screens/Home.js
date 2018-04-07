@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     },
     menu: {
         width: '75%',
-        bottom: 0,
+        // height: '50%',
         right: 0,
         zIndex: 10,
         position: 'absolute'

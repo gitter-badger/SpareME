@@ -42,13 +42,14 @@ const styles = StyleSheet.create({
     menuButton: {
         flex: 1,
         marginVertical: 2.5,
+        padding: 5,
         backgroundColor: constants.COLOR_SECONDARY,
         justifyContent: 'center',
         alignItems: 'center'
     },
     menuText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24,
+        fontSize: 18,
         margin: 5
     }
 });
