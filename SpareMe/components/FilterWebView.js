@@ -89,8 +89,7 @@ export default class FilterWebView extends React.Component {
 
                 this.refs.buttonBar.setState({
                     showFlagButton: !isHiddenElement,
-                    showUnflagButton: isHiddenElement,
-                    showLinkButton: isLink
+                    showUnflagButton: isHiddenElement
                 });
 
                 break;
@@ -99,8 +98,7 @@ export default class FilterWebView extends React.Component {
                 console.log("selection ended");
                 this.refs.buttonBar.setState({
                     showFlagButton: false,
-                    showUnflagButton: false,
-                    showLinkButton: false
+                    showUnflagButton: false
                 })
 
                 break;
@@ -132,7 +130,8 @@ export default class FilterWebView extends React.Component {
 
         this.refs.buttonBar.setState({
             showFlagButton: false,
-            showUnflagButton: false
+            showUnflagButton: false,
+            showCategories: true
         })
     }
 

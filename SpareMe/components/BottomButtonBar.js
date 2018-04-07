@@ -11,30 +11,16 @@ export default class ButtonButtonBar extends React.Component {
         console.log("webview: " + props.webView);
         this.state = {
             showFlagButton: false,
-            showUnflagButton: false
+            showUnflagButton: false,
+            categories: ['hateful', 'harmless', 'awesome']
         }
-    }
 
-    onFlagButtonPress() {
-        this.refs.webView.postMessage({
-            name: 'selectionFlagged'
-        });
-
-        this.setState({
-            showFlagButton: false,
-            showUnflagButton: false
-        })
-    }
-
-    onUnflagButtonPress() {
-        this.refs.webView.postMessage({
-            name: 'selectionUnflagged'
-        });
-
-        this.setState({
-            showFlagButton: false,
-            showUnflagButton: false
-        })
+        // TODO do this instead of setting categories above
+        // api.getCategories(function(response) {
+        //     this.setState({
+        //         categories: response
+        //     });
+        // });
     }
 
     render() {
@@ -56,8 +42,27 @@ export default class ButtonButtonBar extends React.Component {
                         ) :
                             null)
                 }
+                { this.state.showCategories &&
+                    <View style={styles.categoryWrapper}>
+                        {
+                            this.renderCategories()
+                        }
+                    </View>
+                }
             </View>
         );
+    }
+
+    renderCategories() {
+        var index = 0;
+        return this.state.categories.map((item) => {
+            return (
+                <TouchableOpacity key={'category' + index++} style={styles.flagButton} onPress={this.props.webView.onUnflagButtonPress}>
+                    <Image source={require('./visible.png')} style={styles.image}/>
+                    <Text style={styles.flagButtonText}>{item}</Text>
+                </TouchableOpacity>
+            );
+        });
     }
 }
 
@@ -69,6 +74,11 @@ const styles = StyleSheet.create({
         bottom: 15,
         right: 15,
         position: 'absolute'
+    },
+    categoryWrapper: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-end'
     },
     flagButton: {
         backgroundColor: constants.COLOR_MAIN,

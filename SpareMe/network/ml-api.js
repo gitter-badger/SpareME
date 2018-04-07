@@ -107,3 +107,12 @@ export function addTextToCategory(text, category, idToken) {
         //console.log(error);
     });
 }
+
+export function getCategories(callback) {
+    // TODO get these from the API
+    fetch("http://google.com/").then(function(response) {
+        callback(['harmelss', 'hateful', 'bananas']);
+    }).catch(error => {
+        //console.log(error);
+    });
+}
