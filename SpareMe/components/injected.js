@@ -45,6 +45,9 @@ export const injectedJS = `(${String(function() {
      * Handles messages from React
      */
     function onReactMessage(data) {
+        console.log("got data: ");
+        console.log(data);
+        console.log(data.data);
         let action = JSON.parse(data.data);
         let name = action['name'];
 
@@ -60,6 +63,7 @@ export const injectedJS = `(${String(function() {
                 break;
 
             case 'selectionFlagged':
+                console.log("got selectionflagged message")
                 let selectedHTMLElement = window.getSelection().anchorNode.parentElement;
 
                 if (selectedHTMLElement) {
