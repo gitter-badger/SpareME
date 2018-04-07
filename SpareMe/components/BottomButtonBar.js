@@ -23,21 +23,29 @@ export default class ButtonButtonBar extends React.Component {
         // });
     }
 
+    showCategories() {
+        this.setState({
+            showFlagButton: false,
+            showUnflagButton: false,
+            showCategories: true
+        })
+    }
+
     render() {
         return (
             <View style={styles.buttonBar}>
                 { this.state.showFlagButton ?
                     (
-                        <TouchableOpacity style={styles.flagButton} onPress={this.props.webView.onFlagButtonPress}>
-                        <Image source={require('./invisible.png')} style={styles.image}/>
-                        <Text style={styles.flagButtonText}>Flag</Text>
+                        <TouchableOpacity style={styles.flagButton} onPress={() => {this.showCategories()}}>
+                            <Image source={require('./invisible.png')} style={styles.image}/>
+                            <Text style={styles.flagButtonText}>Flag</Text>
                         </TouchableOpacity>
                     ) :
                     ( this.state.showUnflagButton ?
                         (
                             <TouchableOpacity style={styles.flagButton} onPress={this.props.webView.onUnflagButtonPress}>
-                            <Image source={require('./visible.png')} style={styles.image}/>
-                            <Text style={styles.flagButtonText}>Unflag</Text>
+                                <Image source={require('./visible.png')} style={styles.image}/>
+                                <Text style={styles.flagButtonText}>Unflag</Text>
                             </TouchableOpacity>
                         ) :
                             null)
@@ -45,7 +53,7 @@ export default class ButtonButtonBar extends React.Component {
                 { this.state.showCategories &&
                     <View style={styles.categoryWrapper}>
                         {
-                            this.renderCategories()
+                            this.renderCategoryButtons()
                         }
                     </View>
                 }
@@ -53,12 +61,16 @@ export default class ButtonButtonBar extends React.Component {
         );
     }
 
-    renderCategories() {
+    /**
+    * Returns a button for each category in the state
+    */
+    renderCategoryButtons() {
+        if (!this.state.categories) return null;
+
         var index = 0;
         return this.state.categories.map((item) => {
             return (
-                <TouchableOpacity key={'category' + index++} style={styles.flagButton} onPress={this.props.webView.onUnflagButtonPress}>
-                    <Image source={require('./visible.png')} style={styles.image}/>
+                <TouchableOpacity key={'category' + index++} style={styles.flagButton} onPress={() => {this.props.webView.onFlagCategoryButtonPress(item)}}>
                     <Text style={styles.flagButtonText}>{item}</Text>
                 </TouchableOpacity>
             );

@@ -65,6 +65,7 @@ export const injectedJS = `(${String(function() {
             case 'selectionFlagged':
                 console.log("got selectionflagged message")
                 let selectedHTMLElement = window.getSelection().anchorNode.parentElement;
+                let category = action['category'];
 
                 if (selectedHTMLElement) {
                     // Hide the selected element on the page
@@ -75,7 +76,8 @@ export const injectedJS = `(${String(function() {
                         messageType: 'addTextToAPI',
                         text : String(selectedHTMLElement.tagName === 'img' ?
                             selectedHTMLElement.alt :
-                            selectedHTMLElement.innerText)
+                            selectedHTMLElement.innerText),
+                        category: category
                     }));
                 }
                 break;

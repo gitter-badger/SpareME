@@ -10,7 +10,7 @@ export default class FilterWebView extends React.Component {
     constructor(props) {
         super(props);
         this.postMessage = this.postMessage.bind(this);
-        this.onFlagButtonPress = this.onFlagButtonPress.bind(this);
+        this.onFlagCategoryButtonPress = this.onFlagCategoryButtonPress.bind(this);
         this.onUnflagButtonPress = this.onUnflagButtonPress.bind(this);
     }
 
@@ -89,7 +89,8 @@ export default class FilterWebView extends React.Component {
 
                 this.refs.buttonBar.setState({
                     showFlagButton: !isHiddenElement,
-                    showUnflagButton: isHiddenElement
+                    showUnflagButton: isHiddenElement,
+                    showCategories: false
                 });
 
                 break;
@@ -98,7 +99,8 @@ export default class FilterWebView extends React.Component {
                 console.log("selection ended");
                 this.refs.buttonBar.setState({
                     showFlagButton: false,
-                    showUnflagButton: false
+                    showUnflagButton: false,
+                    showCategories: false
                 })
 
                 break;
@@ -121,18 +123,15 @@ export default class FilterWebView extends React.Component {
         this.refs.webView.goForward();
     }
 
-    onFlagButtonPress() {
-        console.log('pressed');
-        console.log(this);
+    onFlagCategoryButtonPress(category) {
         this.postMessage({
-            name: 'selectionFlagged'
+            name: 'selectionFlagged',
+            category: category
         });
 
         this.refs.buttonBar.setState({
-            showFlagButton: false,
-            showUnflagButton: false,
-            showCategories: true
-        })
+            showCategories: false
+        });
     }
 
     onUnflagButtonPress() {
@@ -154,7 +153,7 @@ export default class FilterWebView extends React.Component {
                     ref='webView'
                     injectedJavaScript={injectedJS}
                     onMessage={e => this.onMessage(e.nativeEvent.data)}/>
-                    <BottomButtonBar ref="buttonBar" webView={this}/>
+                <BottomButtonBar ref="buttonBar" webView={this}/>
             </View>
         )
     }
