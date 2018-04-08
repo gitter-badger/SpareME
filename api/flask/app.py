@@ -37,7 +37,7 @@ def index():
     """
     A trivial endpoint left here for debuggging purposes.
     """
-    return 'You found the API!'
+    return 'You found the API!', status.HTTP_200_OK
 
 @app.route('/populate', methods=['POST'])
 def populate():
@@ -115,7 +115,7 @@ def predict():
         return "unlabeled_text unrecognized", status.HTTP_400_BAD_REQUEST
     predicted_labels = classifier.predict(uid, unlabeled_text.values())
     predictions = dict(zip(unlabeled_text.keys(), predicted_labels))
-    return json.dumps(predictions)
+    return json.dumps(predictions), status.HTTP_200_OK
 
 @app.route('/reset', methods=['POST'])
 def reset():
