@@ -64,15 +64,13 @@ export default class ButtonButtonBar extends React.Component {
                             /* Couldn't figure out how to align the content to the
                              right, so I'm just animating it for now. */
                             onContentSizeChange={(contentWidth, contentHeight) => {
-                                this.refs.scrollView.scrollToEnd({animated: true});}}>
-                        {
-                            this.renderCategoryButtons()
-                        }
+                                this.refs.scrollView.scrollToEnd({animated: true});
+                            }
+                        }>
+                            {this.renderCategoryButtons()}
                         </ScrollView>
-                    ):
-                    null
+                    ) : null
                 }
-
             </View>
         );
     }
@@ -98,13 +96,15 @@ export default class ButtonButtonBar extends React.Component {
 
 const styles = StyleSheet.create({
     buttonBar: {
-        bottom: 15,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 15,
+        paddingBottom: 15,
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-end',
-        left: 15,
-        position: 'absolute',
-        right: 15,
+        position: 'absolute'
     },
     flagButton: {
         alignItems: 'center',

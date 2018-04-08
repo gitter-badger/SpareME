@@ -44,11 +44,11 @@ export default class FilterWebView extends React.Component {
 
         let messageType = jsonData['messageType'];
 
-        console.log("got message type: " + messageType);
+        console.log('got message type: ' + messageType);
 
         switch(messageType) {
             case 'addTextToAPI':
-                console.log("adding newly-flagged text to the API. category: " + jsonData['category'] + " text: " + jsonData['text']);
+                console.log('adding newly-flagged text to the API. category: ' + jsonData['category'] + ' text: ' + jsonData['text']);
                 let category = jsonData['category'];
                 api.addTextToCategory(jsonData['text'], category ? category: 'hateful', // TODO let the user pick the category
                 this.props.idToken);
@@ -85,7 +85,7 @@ export default class FilterWebView extends React.Component {
             case 'selectionChanged':
                 let selection = jsonData['content'];
                 let isHiddenElement = jsonData['isHiddenElement'];
-                console.log("selection changed to: " + selection);
+                console.log('selection changed to: ' + selection);
                 this.refs.buttonBar.setState({
                     showFlagButton: !isHiddenElement
                 });
@@ -93,7 +93,7 @@ export default class FilterWebView extends React.Component {
                 break;
 
             case 'selectionEnded':
-                console.log("selection ended");
+                console.log('selection ended');
                 this.refs.buttonBar.setState({
                     showFlagButton: false
                 })
@@ -197,12 +197,11 @@ export default class FilterWebView extends React.Component {
                     onNavigationStateChange={this.navChangeHandler}
                     onMessage={e => this.onMessage(e.nativeEvent.data)}
                 />
-                    { this.state.showFullscreenOpacity ?
-                        (<TouchableOpacity style={styles.fullscreen}
-                            onPress={this.removeFullscreen} />) : null
-                    }
-
-                <BottomButtonBar ref="buttonBar" webView={this} style={{zIndex: 2}}/>
+                {this.state.showFullscreenOpacity ?
+                    (<TouchableOpacity style={styles.fullscreen}
+                        onPress={this.removeFullscreen} />) : null
+                }
+                <BottomButtonBar ref='buttonBar' webView={this} style={{zIndex: 2}}/>
             </View>
         )
     }
