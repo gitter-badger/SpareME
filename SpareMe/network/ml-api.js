@@ -2,7 +2,7 @@
  * @providesModule ml-api
  */
 
-const BASE_URL = "https://test.spareme.pw/";
+const BASE_URL = "https://spareme.pw/";
 const ENDPOINT_ADD = "add";
 const ENDPOINT_PREDICT = "predict"
 const DEFAULT_CATEGORY = "harmless";
