@@ -79,3 +79,4 @@ def delete(uid):
     Deletes all of the user's data from the database.
     """
     db_session.query(LabeledText).filter_by(uid=uid).delete()
+    db_session.query(Classifier).filter_by(uid=uid).delete()
