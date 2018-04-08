@@ -1,7 +1,11 @@
+import os
+from datetime import datetime
+
 from flask import Flask
 from flask import request
 from flask_restful import Resource, Api
 import json
+
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -9,8 +13,13 @@ from sklearn.model_selection import GridSearchCV
 # from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
 from collections import Counter
+
 import firebase_admin
 from firebase_admin import auth, credentials
+
+from models import Label, LabeledText, Classifier
+import database
+from database import db_session
 
 # initialize the firebase server/admin SDK
 cred = credentials.Certificate('firebase-private-key.json')
@@ -22,6 +31,10 @@ default_app = firebase_admin.initialize_app(cred)
 
 app = Flask(__name__)
 api = Api(app)
+
+app.secret_key = os.environ['APP_SECRET_KEY']
+
+database.init_db()
 
 # in-memory data store. begins empty
 cats = []
@@ -49,6 +62,11 @@ parameters = {
     'tfidf__use_idf': (True, False),
     'clf__alpha': (1e-2, 1e-3)}
 gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
+
+
+@app.route('/')
+def index():
+    return 'Hello World!'
 
 
 @app.route('/populate', methods=['GET'])
@@ -82,6 +100,7 @@ def add_strings_to_category(str_array, category):
             gs_clf.fit(data, target)
 
         print("added " + text + " to category " + category + " which is index " + str(cats.index(category)))
+
 
 @app.route('/add', methods=['POST'])
 def add():
@@ -119,6 +138,16 @@ def add():
     # verify prediction pre-requisites
     if text in data:
         return "Error: data store already contains text"
+
+    db_label = db_session.query(Label).filter_by(label=category).first()
+    if not db_label:
+        db_session.add(Label(label=category))
+        db_session.commit()
+        db_label = db_session.query(Label).filter_by(label=category).first()
+
+    labeled_text = LabeledText(timestamp=datetime.now(), uid=uid, label=db_label.id, text=text)
+    db_session.add(labeled_text)
+    db_session.commit()
 
     # add given text to in-memory data store
     data.append(text)

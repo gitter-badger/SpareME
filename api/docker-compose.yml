@@ -1,7 +1,35 @@
 version: '3'
 services:
-  web:
+  db:
+    build: ./postgres
+    image: postgres
+    volumes:
+      # named volume is copied from previous docker-compose runs
+      - dbdata:/var/lib/postgresql/data
+    env_file:
+      - env_file
+    networks:
+      - db_nw
     restart: always
-    build: .
+  flask:
+    build: ./flask
+    image: flask
     ports:
      - "5000:5000"
+    env_file:
+      - env_file
+    networks:
+      - db_nw
+      - flask_nw
+    depends_on:
+      - db
+    restart: always
+networks:
+  db_nw:
+    driver: bridge
+  flask_nw:
+    driver: bridge
+
+volumes:
+  # name the volume so database is copied from previous docker-compose runs
+  dbdata:
