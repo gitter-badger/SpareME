@@ -3,6 +3,8 @@ from sqlalchemy import Column, Integer, JSON, String, Text
 from sqlalchemy.types import DateTime
 from sqlalchemy.schema import ForeignKey
 
+# http://docs.sqlalchemy.org/en/latest/orm/mapping_api.html
+
 class Label(Base):
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)

@@ -6,6 +6,9 @@ from database import db_session
 import database
 database.init_db()
 
+# http://docs.sqlalchemy.org/en/latest/orm/session_api.html
+# http://docs.sqlalchemy.org/en/latest/orm/query.html
+
 def get_label_id(label_text):
     """
     Get the id of the label with the given label text from the database. Adds a
