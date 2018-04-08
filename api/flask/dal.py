@@ -1,0 +1,74 @@
+from datetime import datetime
+from models import Label, LabeledText, Classifier
+from database import db_session
+
+# Create the database tables if they don't already exist
+import database
+database.init_db()
+
+def get_label_id(label_text):
+    """
+    Get the id of the label with the given label text from the database. Adds a
+    new label for the given label text to the database if it's not already
+    there.
+    """
+    label = db_session.query(Label).filter_by(label=label_text).first()
+    if not label:
+        db_session.add(Label(label=label_text))
+        db_session.commit()
+        label = db_session.query(Label).filter_by(label=label_text).first()
+    return label.id
+
+def get_label_text(label_id):
+    """
+    Get the text of the label with the given label id from the database.
+    """
+    return db_session.query(Label).filter_by(id=label_id).first().label
+
+def add_labeled_text(uid, label_text, text):
+    """
+    Adds the given text to the database for a user, labeled with the given
+    label text.
+
+    TODO: if the text is already labeled with a different label, we must remove
+    the existing copy before adding this new one. If it's already labeled with
+    the same label, then we don't need to add it at all.
+    """
+    label_id = get_label_id(label_text)
+    labeled_text = LabeledText(timestamp=datetime.now(), uid=uid, label=label_id, text=text)
+    db_session.add(labeled_text)
+    db_session.commit()
+
+def get_labeled_text(uid):
+    """
+    Get a dictionary of all the given user's labeled text. Training data
+    (labeled text) is in the 'data' key and training targets (label ids) are in
+    the 'targets' key.
+    """
+    all_labeled_text = db_session.query(LabeledText).filter_by(uid=uid)
+    data = [labeled_text.text for labeled_text in all_labeled_text]
+    targets = [labeled_text.label for labeled_text in all_labeled_text]
+    return {'data': data, 'targets': targets}
+
+def populate(uid):
+    """
+    Populates the database for the given user with sample data.
+    """
+    add_labeled_text(uid, 'harmless', 'hello')
+    add_labeled_text(uid, 'harmless', 'world')
+    add_labeled_text(uid, 'harmless', 'smile')
+    add_labeled_text(uid, 'hateful', 'the')
+    add_labeled_text(uid, 'hateful', 'news')
+    add_labeled_text(uid, 'hateful', 'scrub')
+    add_labeled_text(uid, 'christmas', 'trees')
+    add_labeled_text(uid, 'christmas', 'santa')
+    add_labeled_text(uid, 'christmas', 'snow')
+    add_labeled_text(uid, 'awesome', 'virginia')
+    add_labeled_text(uid, 'awesome', 'tech')
+    add_labeled_text(uid, 'awesome', 'hokies')
+
+def delete(uid):
+    """
+    Deletes all of the user's data from the database.
+    """
+    db_session.query(LabeledText).filter_by(uid=uid).delete()

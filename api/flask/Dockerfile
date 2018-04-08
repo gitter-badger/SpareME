@@ -18,7 +18,7 @@ RUN conda update -n base conda && \
 ENV PATH /opt/conda/envs/flask/bin:$PATH
 
 # can't figure out how to install this into the conda environment
-RUN pip install firebase-admin
+RUN pip install firebase-admin Flask-API
 
 # Create a flask user to avoid running uwsgi as root
 RUN useradd -r flask
