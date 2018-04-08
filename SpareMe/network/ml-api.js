@@ -91,7 +91,7 @@ export function addTextToCategory(text, category, idToken) {
     var form = new FormData();
     form.append('text', encodeURIComponent(text));
     form.append('category', encodeURIComponent(category));
-    form.appent('id_token', encodeURIComponent(idToken));
+    form.append('id_token', encodeURIComponent(idToken));
 
     let requestData = {
         method: 'POST',

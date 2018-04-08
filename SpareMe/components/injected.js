@@ -2,9 +2,17 @@
  * Self-executing function to inject into the WebView
  */
 export const injectedJS = `(${String(function() {
-    const INJECTED_CLASSNAME = "SpareMeElement";
-    const HTTP_BATCH_SIZE = 25
+    // Injected classnames
+    const INJECTED_CLASSNAME = 'SpareMeElement';
+    const HIDDEN_CLASSNAME = 'SpareMeHidden';
+    const REVEALED_CLASSNAME = 'SpareMeRevealed';
+
+    // The default API category
+    const DEFAULT_CATEGORY = 'harmless';
+
     var injectedClassCounter = 0;
+
+    const HTTP_BATCH_SIZE = 25
 
     inject();
 
@@ -12,6 +20,7 @@ export const injectedJS = `(${String(function() {
         // Open two-way message channel between React and the WebView
         createMessageSender();
         document.addEventListener('message', onReactMessage);
+        document.addEventListener('selectionchange', onSelection, false);
 
         // Send tags to React for processing
         analyzePage();
@@ -38,39 +47,161 @@ export const injectedJS = `(${String(function() {
     function onReactMessage(data) {
         let action = JSON.parse(data.data);
         let name = action['name'];
-        let className = action['className'];
 
-        if (name === 'hide') {
-            hideElement(document.getElementsByClassName(className)[0]);
+        switch (name) {
+            case 'hide':
+                let className = action['className'];
+                var element = document.getElementsByClassName(className)[0];
+
+                // Only hide elements once :D
+                if (!isHidden(element) && !isRevealed(element)) {
+                    hideElement(element);
+                }
+                break;
+
+            case 'selectionFlagged':
+                let selectedHTMLElement = window.getSelection().anchorNode.parentElement;
+
+                if (selectedHTMLElement) {
+                    // Hide the selected element on the page
+                    hideElement(selectedHTMLElement);
+
+                    // Alert React that the user hid an element
+                    window.postMessage(JSON.stringify({
+                        messageType: 'addTextToAPI',
+                        text : String(selectedHTMLElement.tagName === 'img' ?
+                            selectedHTMLElement.alt :
+                            selectedHTMLElement.innerText)
+                    }));
+                }
+                break;
+
+            case 'selectionUnflagged':
+                var element = window.revealedElement;
+                element.classList.remove(REVEALED_CLASSNAME);
+
+                // Alert React that the user unflagged an element
+                window.postMessage(JSON.stringify({
+                    messageType: 'addTextToAPI',
+                    text : String(element.tagName === 'img' ?
+                        element.alt :
+                        element.innerText),
+                        category: DEFAULT_CATEGORY
+                }));
+                break;
+
+            case 'unflagIgnored':
+                var element = window.revealedElement;
+                hideElement(element);
+                break;
+
+            default:
+                // Unknown message type
+                break;
         }
     }
 
     function hideElement(element) {
-        element.classList.add('SpareMeHidden');
+        element.classList.add(HIDDEN_CLASSNAME);
+
+        // Cascade class down to all children
+        for (var i = 0; i < element.children.length; i++) {
+            element.children.item(i).classList.add(HIDDEN_CLASSNAME);
+        }
+
         element.style.filter = 'blur(10px)';
+        element.style.webkitUserSelect = 'none';
         element.addEventListener('click', onHiddenElementClick(element));
+        configureLongPressActions(element)
+    }
+
+    function revealElement(element) {
+        element.classList.remove(HIDDEN_CLASSNAME);
+        element.classList.add(REVEALED_CLASSNAME);
+        element.style.webkitUserSelect = 'auto';
+        element.style.filter = 'blur(0px)';
+        window.revealedElement = element;
+    }
+
+    function configureLongPressActions(node) {
+        var longpress = false;
+        var presstimer = null;
+
+        var cancel = function(e) {
+            if (presstimer !== null) {
+                clearTimeout(presstimer);
+                presstimer = null;
+            }
+        };
+
+        var start = function(e) {
+            longpress = false;
+            presstimer = setTimeout(function() {
+                revealElement(node)
+                longpress = true;
+            }, 500);
+        };
+
+        node.addEventListener('touchstart', start);
+        node.addEventListener('touchend', cancel);
+        node.addEventListener('touchleave', cancel);
+        node.addEventListener('touchcancel', cancel);
     }
 
     function onHiddenElementClick(element) {
         return function(event) {
-            if (element.classList.contains('SpareMeHidden')) {
+            if (isHidden(element)) {
                 /* Element must be revealed before allowing
                 its normal onclick to fire */
                 event.preventDefault();
 
+                window.postMessage(JSON.stringify({
+                    messageType: 'elementRevealed'
+                }));
+
                 // Reveal the element
-                element.classList.remove('SpareMeHidden');
-                element.classList.add('SpareMeRevealed');
-                element.style.filter = 'blur(0px)';
+                revealElement(element);
             }
         }
     }
 
+    /**
+     * Sends un-hidden text selections to React.
+     */
+    function onSelection() {
+        let textSelection = window.getSelection();
+
+        if (textSelection == '') {
+            window.postMessage(JSON.stringify({
+                messageType: 'selectionEnded'
+            }));
+            return;
+        }
+
+        let selectedHTMLElement = textSelection.anchorNode.parentElement;
+        var isHiddenElement = selectedHTMLElement.classList.contains(HIDDEN_CLASSNAME);
+
+        window.postMessage(JSON.stringify({
+            messageType: 'selectionChanged',
+            content : window.getSelection().toString(),
+            isHiddenElement: isHiddenElement
+        }));
+    }
+
     function analyzePage() {
-        var elements = document.body.querySelectorAll('p, a, li, span');
-        var predictionGroup = {}
+        var elements = document.body.querySelectorAll('p, a, li, h1, h2, h3, h4, span, div');
+        var predictionGroup = {};
         for (var i = 0; i < elements.length; i++) {
             var element = elements[i]
+
+            // Discard divs and spans that wrap other HTML elements
+            if (element.tagName === 'SPAN' || element.tagName === 'DIV') {
+                if (element.childElementCount != 0) {
+                    continue;
+                } else {
+                    console.log('Found non-empty div/span');
+                }
+            }
 
             // Add unique class so we can find this element later
             let addedClass = INJECTED_CLASSNAME + injectedClassCounter;
@@ -90,6 +221,14 @@ export const injectedJS = `(${String(function() {
                 predictionGroup = {}
             }
         }
+    }
+
+    function isHidden(element) {
+        return element.classList.contains(HIDDEN_CLASSNAME);
+    }
+
+    function isRevealed(element) {
+        return element.classList.contains(REVEALED_CLASSNAME);
     }
 
 })})();` // JavaScript :)
