@@ -64,7 +64,7 @@ class URLBar extends Component {
     render() {
         const {backHandler, forwardHandler, refreshHandler, onChangeHandler, onMenuPressed, url} = this.props;
           return (
-              <View style={styles.bar} onLayout={this.onLayout}>
+              <View style={[styles.bar, {marginLeft: -BAR_HORIZONTAL_PADDING}]} onLayout={this.onLayout}>
                   <TouchableOpacity
                       disabled={!this.state.canGoBack}
                       style={styles.barButton}
@@ -76,7 +76,7 @@ class URLBar extends Component {
                   </TouchableOpacity>
                   <TouchableOpacity
                       disabled={!this.state.canGoForward}
-                      style={styles.barButton}
+                      style={[styles.barButton, {marginRight: -BAR_HORIZONTAL_PADDING}]}
                       onPress={ () => {
                           forwardHandler();
                       }
@@ -104,7 +104,7 @@ class URLBar extends Component {
                       keyboardType={Platform.OS === 'ios' ? 'web-search' : 'default'}
                   />
                   <TouchableOpacity
-                      style={styles.barButton}
+                      style={[styles.barButton, {marginLeft: -BAR_HORIZONTAL_PADDING}]}
                       onPress={ () => {
                           refreshHandler();
                       }
@@ -112,7 +112,7 @@ class URLBar extends Component {
                       <Image source={require('./refresh.png')} style={styles.refresh}/>
                   </TouchableOpacity>
                   <TouchableOpacity
-                      style={styles.barButton}
+                      style={[styles.barButton, {marginRight: -BAR_HORIZONTAL_PADDING}]}
                       onPress={onMenuPressed}
                   >
                       <Image source={require('./menu.png')} style={styles.refresh}/>
@@ -122,6 +122,8 @@ class URLBar extends Component {
     }
 }
 
+const BAR_HORIZONTAL_PADDING = 5;
+
 const styles = StyleSheet.create({
     arrow: {
         height: 30,
@@ -130,18 +132,19 @@ const styles = StyleSheet.create({
     },
     bar: {
         flexDirection: 'row',
-        paddingHorizontal: 5,
+        paddingHorizontal: BAR_HORIZONTAL_PADDING,
         paddingVertical: 10,
         backgroundColor: constants.COLOR_MAIN,
         alignItems: 'center',
         justifyContent: 'space-between'
     },
     barButton: {
-        height: 30,
-        width: 30,
+        marginVertical: -15,
+        height: 55,
+        width: 35,
         backgroundColor: constants.COLOR_MAIN,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     disabled: {
         tintColor: constants.COLOR_DISABLED
@@ -152,7 +155,7 @@ const styles = StyleSheet.create({
         resizeMode: 'contain'
     },
     url: {
-        height: 30,
+        height: 35,
         flex: 1,
         paddingHorizontal: 10,
         paddingVertical: 5,
