@@ -3,7 +3,7 @@
  */
 
 const ADD = "add";
-const BASE_URL = "http://spareme.pw/";
+const BASE_URL = "https://spareme.pw/";
 const DEFAULT_CATEGORY = "harmless";
 const PREDICT = "predict?text=";
 const PREDICT_BATCH = "predictBatch?"
