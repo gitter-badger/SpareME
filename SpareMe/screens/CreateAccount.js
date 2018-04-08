@@ -177,7 +177,6 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
     input: {
-        height: 20,
         alignSelf: 'stretch',
         fontSize: 16,
         marginBottom: 10,
