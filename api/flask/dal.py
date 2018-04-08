@@ -9,7 +9,7 @@ database.init_db()
 # http://docs.sqlalchemy.org/en/latest/orm/session_api.html
 # http://docs.sqlalchemy.org/en/latest/orm/query.html
 
-def get_label_id(label_text):
+def get_label_id(uid, label_text):
     """
     Get the id of the label with the given label text from the database. Adds a
     new label for the given label text to the database if it's not already
@@ -17,12 +17,12 @@ def get_label_id(label_text):
     """
     label = db_session.query(Label).filter_by(label=label_text).first()
     if not label:
-        db_session.add(Label(label=label_text))
+        db_session.add(Label(uid=uid, label=label_text))
         db_session.commit()
-        label = db_session.query(Label).filter_by(label=label_text).first()
+        label = db_session.query(Label).filter_by(uid=uid, label=label_text).first()
     return label.id
 
-def get_label_text(label_id):
+def get_label_text(uid, label_id):
     """
     Get the text of the label with the given label id from the database.
 
@@ -30,7 +30,7 @@ def get_label_text(label_id):
     labels to be deleted and therefore can avoid hitting the db unless the
     cache doesn't contain the given id.
     """
-    return db_session.query(Label).filter_by(id=label_id).first().label
+    return db_session.query(Label).filter_by(uid=uid, id=label_id).first().label
 
 def add_labeled_text(uid, label_text, text):
     """
@@ -41,7 +41,7 @@ def add_labeled_text(uid, label_text, text):
     the existing copy before adding this new one. If it's already labeled with
     the same label, then we don't need to add it at all.
     """
-    label_id = get_label_id(label_text)
+    label_id = get_label_id(uid, label_text)
     labeled_text = LabeledText(timestamp=datetime.now(), uid=uid, label=label_id, text=text)
     db_session.add(labeled_text)
     db_session.commit()
@@ -79,4 +79,5 @@ def delete(uid):
     Deletes all of the user's data from the database.
     """
     db_session.query(LabeledText).filter_by(uid=uid).delete()
+    db_session.query(Label).filter_by(uid=uid).delete()
     db_session.query(Classifier).filter_by(uid=uid).delete()

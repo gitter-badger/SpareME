@@ -52,4 +52,4 @@ def predict(uid, unlabeled_text):
     if not initialized:
         return ['harmless' for _ in unlabeled_text]
     predicted_ids = gs_clf.predict(unlabeled_text)
-    return [dal.get_label_text(int(id)) for id in predicted_ids]
+    return [dal.get_label_text(uid, int(id)) for id in predicted_ids]

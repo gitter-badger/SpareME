@@ -8,6 +8,7 @@ from sqlalchemy.schema import ForeignKey
 class Label(Base):
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
+    uid = Column(String(256))
     label = Column(String(256), unique=True)
 
 class LabeledText(Base):
