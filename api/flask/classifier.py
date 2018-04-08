@@ -24,6 +24,8 @@ parameters = {
     'tfidf__use_idf': (True, False),
     'clf__alpha': (1e-2, 1e-3)}
 gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
+# hack because we can't otherwise tell whether or not gs_clf has been fit yet.
+initialized = False
 
 def fit(uid):
     """
@@ -33,8 +35,13 @@ def fit(uid):
     the global classifier.
     """
     labeled_text = dal.get_labeled_text(uid)
-    gs_clf.fit(labeled_text['data'], labeled_text['targets'])
- 
+    # Requires enough data for each target to be split into training, test, and
+    # validation sets.
+    if len(labeled_text['targets']) >= 2 and all(i >= 3 for i in Counter(labeled_text['targets']).values()):
+        gs_clf.fit(labeled_text['data'], labeled_text['targets'])
+        global initialized
+        initialized = True
+
 def predict(uid, unlabeled_text):
     """
     Predicts the text label of every value in the given list of unlabeled text.
@@ -42,5 +49,7 @@ def predict(uid, unlabeled_text):
     TODO: get the given user's actual classifier from persistence and use that
     rather than using the global classifier.
     """
+    if not initialized:
+        return ['harmless' for _ in unlabeled_text]
     predicted_ids = gs_clf.predict(unlabeled_text)
     return [dal.get_label_text(int(id)) for id in predicted_ids]
