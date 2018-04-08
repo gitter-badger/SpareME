@@ -4,15 +4,15 @@ import { StyleSheet, WebView, TouchableOpacity, Icon, View, Image, Text } from '
 import * as api from 'ml-api'
 import * as constants from 'constants'
 import { injectedJS } from './injected.js'
+import BottomButtonBar from './BottomButtonBar.js'
 
 export default class FilterWebView extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {
-            showFlagButton: false,
-            showUnflagButton: false
+            showFullscreenOpacity: false
         }
-        this.postMessage = this.postMessage.bind(this);
     }
 
     componentDidMount() {
@@ -26,7 +26,7 @@ export default class FilterWebView extends React.Component {
     /**
     * Sends a message from React Native to the WebView
     */
-    postMessage(action) {
+    postMessage = (action) => {
         this.refs.webView.postMessage(JSON.stringify(action));
     }
 
@@ -44,11 +44,11 @@ export default class FilterWebView extends React.Component {
 
         let messageType = jsonData['messageType'];
 
-        console.log("got message type: " + messageType);
+        console.log('got message type: ' + messageType);
 
         switch(messageType) {
             case 'addTextToAPI':
-                console.log("adding newly-flagged text to the API. category: " + jsonData['category'] + " text: " + jsonData['text']);
+                console.log('adding newly-flagged text to the API. category: ' + jsonData['category'] + ' text: ' + jsonData['text']);
                 let category = jsonData['category'];
                 api.addTextToCategory(jsonData['text'], category ? category: 'hateful', // TODO let the user pick the category
                 this.props.idToken);
@@ -79,23 +79,22 @@ export default class FilterWebView extends React.Component {
                         } catch (error) {
                             console.log(error)
                         }
-                    })
+                    });
                     break;
 
             case 'selectionChanged':
                 let selection = jsonData['content'];
                 let isHiddenElement = jsonData['isHiddenElement'];
-                console.log("selection changed to: " + selection);
-
-                this.setState({
+                console.log('selection changed to: ' + selection);
+                this.refs.buttonBar.setState({
                     showFlagButton: !isHiddenElement
                 });
 
                 break;
 
             case 'selectionEnded':
-                console.log("selection ended");
-                this.setState({
+                console.log('selection ended');
+                this.refs.buttonBar.setState({
                     showFlagButton: false
                 })
 
@@ -103,54 +102,20 @@ export default class FilterWebView extends React.Component {
 
             case 'elementRevealed':
                 console.log('elementRevealed');
-                this.setState({
+                this.refs.buttonBar.setState({
                     showFlagButton: false,
                     showUnflagButton: true
+                });
+
+                this.setState({
+                    showFullscreenOpacity: true
                 })
 
                 break;
 
             default:
-                /* Message contains either no known messageType or the message
-                is not a JSON object. */
+                /* Unknown message type */
         }
-    }
-
-    onFlagButtonPress() {
-        this.postMessage({
-            name: 'selectionFlagged'
-        });
-
-        this.setState({
-            showFlagButton: false,
-            showUnflagButton: false
-        })
-    }
-
-    onUnflagButtonPress() {
-        this.postMessage({
-            name: 'selectionUnflagged'
-        });
-
-        this.setState({
-            showFlagButton: false,
-            showUnflagButton: false
-        });
-    }
-
-    removeFullscreen = () => {
-        this.postMessage({
-            name: 'unflagIgnored'
-        });
-        this.setState({showUnflagButton: false});
-    }
-
-    navChangeHandler = (webState) => {
-        this.props.navChangeHandler(webState);
-        this.setState({
-            showFlagButton: false,
-            showUnflagButton: false
-        });
     }
 
     refresh() {
@@ -165,6 +130,63 @@ export default class FilterWebView extends React.Component {
         this.refs.webView.goForward();
     }
 
+    onFlagCategoryButtonPress = (category) => {
+        this.postMessage({
+            name: 'selectionFlagged',
+            category: category
+        });
+
+        this.refs.buttonBar.setState({
+            showCategories: false
+        });
+    }
+
+    onUnflagButtonPress = () => {
+        this.postMessage({
+            name: 'selectionUnflagged'
+        });
+
+        this.refs.buttonBar.setState({
+            showFlagButton: false,
+            showUnflagButton: false
+        });
+
+        this.setState({
+            showFullscreenOpacity: false
+        });
+    }
+
+    removeFullscreen = () => {
+        console.log('called removefullscreen');
+        let removeCategories = this.refs.buttonBar.state.showCategories;
+
+        if (removeCategories) {
+            this.refs.buttonBar.setState({showCategories: false});
+        } else { /* remove unflag button */
+            this.refs.buttonBar.setState({showUnflagButton: false});
+            this.postMessage({
+                name: 'unflagIgnored'
+            });
+        }
+
+        this.setState({showFullscreenOpacity: false});
+    }
+
+    navChangeHandler = (webState) => {
+        this.props.navChangeHandler(webState);
+        if (!webState.url.includes('react-js-navigation://postMessage')) {
+            this.refs.buttonBar.setState({
+                showFlagButton: false,
+                showUnflagButton: false,
+                showCategories: false
+            });
+
+            this.setState({
+                showFullscreenOpacity: false
+            });
+        }
+    }
+
     render() {
         return (
             <View style={styles.web}>
@@ -173,46 +195,19 @@ export default class FilterWebView extends React.Component {
                     ref='webView'
                     injectedJavaScript={injectedJS}
                     onNavigationStateChange={this.navChangeHandler}
-                    onMessage={e => this.onMessage(e.nativeEvent.data)}/>
-                {this.state.showUnflagButton ? (<TouchableOpacity style={styles.fullscreen} onPress={this.removeFullscreen} />) : null}
-                {this.state.showFlagButton ? (
-                    <TouchableOpacity style={styles.flagButton} onPress={() => this.onFlagButtonPress()}>
-                        <Image source={require('./invisible.png')} style={styles.image}/>
-                        <Text style={styles.flagButtonText}>Flag</Text>
-                    </TouchableOpacity>
-                ) : (this.state.showUnflagButton ? (
-                    <TouchableOpacity style={styles.flagButton} onPress={() => this.onUnflagButtonPress()}>
-                        <Image source={require('./visible.png')} style={styles.image}/>
-                        <Text style={styles.flagButtonText}>Unflag</Text>
-                    </TouchableOpacity>
-                ) : null)   }
+                    onMessage={e => this.onMessage(e.nativeEvent.data)}
+                />
+                {this.state.showFullscreenOpacity ?
+                    (<TouchableOpacity style={styles.fullscreen}
+                        onPress={this.removeFullscreen} />) : null
+                }
+                <BottomButtonBar ref='buttonBar' webView={this} style={{zIndex: 2}}/>
             </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
-    flagButton: {
-        backgroundColor: constants.COLOR_MAIN,
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 74,
-        width: 74,
-        borderRadius: 37,
-        bottom: 20,
-        right: 20,
-        zIndex: 3,
-        position: 'absolute'
-    },
-    flagButtonText: {
-        color: 'white',
-        fontSize: 15
-    },
-    image: {
-        height: 30,
-        aspectRatio: 1,
-        resizeMode: 'contain'
-    },
     web: {
         flex: 1,
         backgroundColor: '#fff'
@@ -220,7 +215,6 @@ const styles = StyleSheet.create({
     fullscreen: {
         height: '100%',
         width: '100%',
-        zIndex: 2,
         position: 'absolute'
     }
 });
