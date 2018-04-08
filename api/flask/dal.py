@@ -22,6 +22,10 @@ def get_label_id(label_text):
 def get_label_text(label_id):
     """
     Get the text of the label with the given label id from the database.
+
+    TODO: we can probably use caching to speed this up since we don't allow
+    labels to be deleted and therefore can avoid hitting the db unless the
+    cache doesn't contain the given id.
     """
     return db_session.query(Label).filter_by(id=label_id).first().label
 
