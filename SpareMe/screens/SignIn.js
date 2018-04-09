@@ -32,7 +32,8 @@ export default class SignIn extends Component {
         const { email, password } = this.state;
         firebase.auth().signInWithEmailAndPassword(email, password)
         .then((user) => {
-            this.props.navigation.goBack();
+            console.log(this.props);
+            this.props.isATab ? this.props.navigateHome() : this.props.navigation.goBack();
             // If you need to do anything with the user, do it here
             // The user will be logged in automatically by the
             // `onAuthStateChanged` listener we set up in App.js earlier
@@ -125,19 +126,21 @@ export default class SignIn extends Component {
                     />
 
                     <View style={styles.buttonContainer}>
-                        <View style={styles.leftButton}>
+                        <View style={styles.button}>
                             <Button
                                 title='Sign In'
                                 onPress={this.onLogin}
                             />
                         </View>
-                        <View style={styles.button}>
-                            <Button
-                                title='Cancel'
-                                onPress={() => this.props.navigation.goBack()}
-                                color='red'
-                            />
-                        </View>
+                        { this.props.isATab ? null : (
+                            <View style={styles.button}>
+                                <Button
+                                    title='Cancel'
+                                    onPress={() => this.props.navigation.goBack()}
+                                    color='red'
+                                />
+                            </View>
+                        )}
                     </View>
                 </View>
             </View>
@@ -161,14 +164,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 20
     },
-    leftButton: {
-        flex: 1,
-        height: 40,
-        marginRight: 10
-    },
     button: {
         flex: 1,
-        height: 40
+        height: 40,
+        margin: 5
     },
     connectionContainer: {
         flex: 1,

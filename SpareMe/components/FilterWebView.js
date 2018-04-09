@@ -217,6 +217,7 @@ const styles = StyleSheet.create({
     fullscreen: {
         height: '100%',
         width: '100%',
-        position: 'absolute'
+        position: 'absolute',
+        backgroundColor: '#77777777'
     }
 });
