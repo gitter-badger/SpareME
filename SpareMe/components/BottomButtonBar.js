@@ -5,22 +5,22 @@ import * as api from 'ml-api'
 import * as constants from 'constants'
 import { injectedJS } from './injected.js'
 
-export default class ButtonButtonBar extends React.Component {
+export default class BottomButtonBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             showFlagButton: false,
             showUnflagButton: false
         }
+    }
 
-        api.getCategories((response) => {
+    showCategories() {
+        api.getCategories(this.props.idToken, (response) => {
             this.setState({
                 categories: response
             });
         });
-    }
 
-    showCategories() {
         this.setState({
             showFlagButton: false,
             showUnflagButton: false,

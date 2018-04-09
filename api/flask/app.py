@@ -37,7 +37,7 @@ def index():
     """
     A trivial endpoint left here for debuggging purposes.
     """
-    return 'You found the API!'
+    return 'You found the API!', status.HTTP_200_OK
 
 @app.route('/populate', methods=['POST'])
 def populate():
@@ -115,7 +115,7 @@ def predict():
         return "unlabeled_text unrecognized", status.HTTP_400_BAD_REQUEST
     predicted_labels = classifier.predict(uid, unlabeled_text.values())
     predictions = dict(zip(unlabeled_text.keys(), predicted_labels))
-    return json.dumps(predictions)
+    return json.dumps(predictions), status.HTTP_200_OK
 
 @app.route('/reset', methods=['POST'])
 def reset():
@@ -136,3 +136,23 @@ def reset():
             return "id_token invalid", status.HTTP_400_BAD_REQUEST
     dal.delete(uid)
     return "User data deleted", status.HTTP_202_ACCEPTED
+
+@app.route('/labels', methods=['POST'])
+def labels():
+    """
+    Get a list of all the given user's labels.
+    """
+    try:
+        id_token = request.form['id_token']
+        uid = verify_id_token(id_token)
+    except KeyError:
+        return "id_token required", status.HTTP_400_BAD_REQUEST
+    except ValueError:
+        return "id_token unrecognized", status.HTTP_400_BAD_REQUEST
+    except auth.AuthError as exc:
+        if exc.code == 'ID_TOKEN_REVOKED':
+            return "id_token revoked", status.HTTP_400_BAD_REQUEST
+        else:
+            return "id_token invalid", status.HTTP_400_BAD_REQUEST
+    labels = dal.get_labels(uid)
+    return json.dumps(labels), status.HTTP_200_OK
