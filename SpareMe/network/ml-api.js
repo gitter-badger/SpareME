@@ -29,7 +29,8 @@ export function getCategoriesForBatch(batch, idToken, callback) {
     }
 
     fetch(url, requestData).then(function(response) {
-        callback(response._bodyText);
+        console.log('getCategoriesForBatch got response: ' + JSON.stringify(response._bodyText));
+        callback(JSON.parse(response._bodyText));
     }).catch(error => {
         console.log(error);
     });

@@ -58,14 +58,12 @@ export default class FilterWebView extends React.Component {
                 let predictionBatch = jsonData['content'];
 
                 api.getCategoriesForBatch(predictionBatch, this.props.idToken,
-                    (response) => {
+                    (categories) => {
                         try {
-                            console.log('got response: ' + response);
-                            let responseJSON = JSON.parse(response)
-                            for (var key in responseJSON) {
-                                if (!responseJSON.hasOwnProperty(key)) continue;
+                            for (var key in categories) {
+                                if (!categories.hasOwnProperty(key)) continue;
 
-                                let category = responseJSON[key];
+                                let category = categories[key];
                                 if (category === constants.HATEFUL) {
                                     console.log('hiding: ' + key);
                                     this.postMessage({
