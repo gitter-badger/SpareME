@@ -1,294 +1,138 @@
 import os
-from datetime import datetime
 
 from flask import Flask
 from flask import request
+from flask_api import status
 from flask_restful import Resource, Api
 import json
-
-from sklearn.pipeline import Pipeline
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.model_selection import GridSearchCV
-# from sklearn.naive_bayes import MultinomialNB
-from sklearn.linear_model import SGDClassifier
-from collections import Counter
 
 import firebase_admin
 from firebase_admin import auth, credentials
 
-from models import Label, LabeledText, Classifier
-import database
-from database import db_session
+import dal
+import classifier
 
 # initialize the firebase server/admin SDK
 cred = credentials.Certificate('firebase-private-key.json')
 default_app = firebase_admin.initialize_app(cred)
-
-# for debugging access control
-# auth.set_custom_user_claims('Xua9VRs4C7eqnLAJL945orgT4Au2', {'admin': True})
-# auth.set_custom_user_claims('Xua9VRs4C7eqnLAJL945orgT4Au2', None)
 
 app = Flask(__name__)
 api = Api(app)
 
 app.secret_key = os.environ['APP_SECRET_KEY']
 
-database.init_db()
-
-# in-memory data store. begins empty
-cats = []
-data = []
-target = []
-
-# multinomial naive bayes classifier based on word counts
-# text_clf = Pipeline([
-#     ('vect', CountVectorizer()), 
-#     ('tfidf', TfidfTransformer()),
-#     ('clf', MultinomialNB())])
-
-# alternative support vector machine classifier
-text_clf = Pipeline([
-    ('vect', CountVectorizer()),
-    ('tfidf', TfidfTransformer()),
-    ('clf', SGDClassifier(
-        loss='hinge', penalty='l2',
-        alpha=1e-3, random_state=42,
-        max_iter=5, tol=None))])
-
-# exhaustively search for best classifier parameters
-parameters = {
-    'vect__ngram_range': [(1, 1), (1, 2)],
-    'tfidf__use_idf': (True, False),
-    'clf__alpha': (1e-2, 1e-3)}
-gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
-
+def verify_id_token(id_token):
+    """
+    Verifies the given id token and returns the user's uid if successful.
+    Otherwise, throws an exception.
+    """
+    # Verify the ID token while checking if the token is revoked by
+    # passing check_revoked=True
+    decoded_token = auth.verify_id_token(id_token, check_revoked=True)
+    # Token is valid and not revoked
+    return decoded_token['uid']
 
 @app.route('/')
 def index():
-    return 'Hello World!'
+    """
+    A trivial endpoint left here for debuggging purposes.
+    """
+    return 'You found the API!'
 
-
-@app.route('/populate', methods=['GET'])
+@app.route('/populate', methods=['POST'])
 def populate():
-    # if len(cats) < 2 or any(i < 3 for i in Counter(target).values()):
-    add_strings_to_category(['hello', 'world', 'smile'], 'harmless')
-    add_strings_to_category(['the', 'news', 'scrub'], 'hateful')
-    add_strings_to_category(['trees', 'santa', 'snow'], 'christmas')
-    add_strings_to_category(['virginia', 'tech', 'hokies'], 'awesome')
-
-    return "The models have been populated with sample data."
-
-
-def add_strings_to_category(str_array, category):
-    for text in str_array:
-        if text in data:
-            return "Error: data store already contains text"
-
-        # add given text to in-memory data store
-        data.append(text)
-        if category not in cats:
-            cats.append(category)
-        target.append(cats.index(category))
-
-        # build classifier if pre-requisites satisfied
-        # if len(cats) >= 2:
-        # requires enough categories to make a meaningful prediction
-        # text_clf.fit(data, target)
-        if len(cats) >= 2 and all(i >= 3 for i in Counter(target).values()):
-            # requires enough data to split into training, test, and validation sets
-            gs_clf.fit(data, target)
-
-        print("added " + text + " to category " + category + " which is index " + str(cats.index(category)))
-
+    """
+    Populates the database for the given user with sample data.
+    """
+    try:
+        id_token = request.form['id_token']
+        uid = verify_id_token(id_token)
+    except KeyError:
+        return "id_token required", status.HTTP_400_BAD_REQUEST
+    except ValueError:
+        return "id_token unrecognized", status.HTTP_400_BAD_REQUEST
+    except auth.AuthError as exc:
+        if exc.code == 'ID_TOKEN_REVOKED':
+            return "id_token revoked", status.HTTP_400_BAD_REQUEST
+        else:
+            return "id_token invalid", status.HTTP_400_BAD_REQUEST
+    dal.populate(uid)
+    classifier.fit(uid)
+    return "Sample data added for user", status.HTTP_202_ACCEPTED
 
 @app.route('/add', methods=['POST'])
 def add():
-    # extract arguments from post request
+    """
+    Adds the given text to the database for a user, labeled with the given
+    label text, and re-fits their classifier.
+    """
+    try:
+        id_token = request.form['id_token']
+        uid = verify_id_token(id_token)
+    except KeyError:
+        return "id_token required", status.HTTP_400_BAD_REQUEST
+    except ValueError:
+        return "id_token unrecognized", status.HTTP_400_BAD_REQUEST
+    except auth.AuthError as exc:
+        if exc.code == 'ID_TOKEN_REVOKED':
+            return "id_token revoked", status.HTTP_400_BAD_REQUEST
+        else:
+            return "id_token invalid", status.HTTP_400_BAD_REQUEST
+    try:
+        label = request.form['label']
+    except KeyError:
+        return "label required", status.HTTP_400_BAD_REQUEST
     try:
         text = request.form['text']
-        category = request.form['category']
-        id_token = request.form['id_token']
     except KeyError:
-        return "Error: must specify the 'text', 'category', and 'id_token' keys when making a POST to /add"
+        return "text required", status.HTTP_400_BAD_REQUEST
+    dal.add_labeled_text(uid, label, text)
+    classifier.fit(uid)
+    return "Labeled text added for user", status.HTTP_202_ACCEPTED
 
-    try:
-        # Verify the ID token while checking if the token is revoked by
-        # passing check_revoked=True
-        decoded_token = auth.verify_id_token(id_token, check_revoked=True)
-        # Token is valid and not revoked
-        uid = decoded_token['uid']
-    except ValueError:
-        return "Error: token malformed"
-    except auth.AuthError as exc:
-        if exc.code == 'ID_TOKEN_REVOKED':
-            return "Error: token revoked; user must reauthenticate or sign out"
-        else:
-            return "Error: token invalid"
-
-    # get the actual user from the uid
-    user = auth.get_user(uid)
-
-    # control access using custom claim
-    print(user.custom_claims)
-    if user.custom_claims is None or user.custom_claims.get('admin') is not True:
-        # Prevent access to admin resource.
-        return "Error: user is not allowed to access this resource"
-
-    # verify prediction pre-requisites
-    if text in data:
-        return "Error: data store already contains text"
-
-    db_label = db_session.query(Label).filter_by(label=category).first()
-    if not db_label:
-        db_session.add(Label(label=category))
-        db_session.commit()
-        db_label = db_session.query(Label).filter_by(label=category).first()
-
-    labeled_text = LabeledText(timestamp=datetime.now(), uid=uid, label=db_label.id, text=text)
-    db_session.add(labeled_text)
-    db_session.commit()
-
-    # add given text to in-memory data store
-    data.append(text)
-    if category not in cats:
-        cats.append(category)
-    target.append(cats.index(category))
-
-    # build classifier if pre-requisites satisfied
-    # if len(cats) >= 2:
-        # requires enough categories to make a meaningful prediction
-        # text_clf.fit(data, target)
-    if len(cats) >= 2 and all(i >= 3 for i in Counter(target).values()):
-        # requires enough data to split into training, test, and validation sets
-        gs_clf.fit(data, target)
-
-    # return value is arbitrary
-    return "added " + text + " to category " + category + " which is index " + str(cats.index(category))
-
-
-@app.route('/predict', methods=['GET'])
+@app.route('/predict', methods=['POST'])
 def predict():
-    # extract arguments from get request
+    """
+    Predicts the text label of every value in the given list of unlabeled text.
+    """
     try:
-        text = request.args['text']
-        id_token = request.args['id_token']
+        id_token = request.form['id_token']
+        uid = verify_id_token(id_token)
     except KeyError:
-        return "Error: must specify the 'text' and 'id_token' args when making a GET to /predict"
-
-    try:
-        # Verify the ID token while checking if the token is revoked by
-        # passing check_revoked=True
-        decoded_token = auth.verify_id_token(id_token, check_revoked=True)
-        # Token is valid and not revoked
-        uid = decoded_token['uid']
+        return "id_token required", status.HTTP_400_BAD_REQUEST
     except ValueError:
-        return "Error: token malformed"
+        return "id_token unrecognized", status.HTTP_400_BAD_REQUEST
     except auth.AuthError as exc:
         if exc.code == 'ID_TOKEN_REVOKED':
-            return "Error: token revoked; user must re-authenticate or sign out"
+            return "id_token revoked", status.HTTP_400_BAD_REQUEST
         else:
-            return "Error: token invalid"
-
-    # get the actual user from the uid
-    user = auth.get_user(uid)
-    #
-    # # control access using custom claim
-    if user.custom_claims is None or user.custom_claims.get('admin') is not True:
-        # Prevent access to admin resource.
-        return "Error: user is not allowed to access this resource"
-
-    # verify prediction pre-requisites
-    # if len(cats) < 2:
-    if len(cats) < 2 or any(i < 3 for i in Counter(target).values()):
-        return "Error: not enough data to predict"
-
-    # predict category of given text
-    # return cats[text_clf.predict([text])[0]]
-    return cats[gs_clf.predict([text])[0]]
-
-
-# Request format is /predictBatch?SpareMeElement0=<encoded_string>&id_token=<token>
-@app.route('/predictBatch', methods=['GET'])
-def predict_batch():
-    # extract arguments from get request
+            return "id_token invalid", status.HTTP_400_BAD_REQUEST
     try:
-        id_token = request.args['id_token']
+        unlabeled_text = json.loads(request.form['unlabeled_text'])
     except KeyError:
-        return "Error: must specify at least one SpareMeElement<index> arg and id_token arg when making a GET to " \
-               "/predictBatch "
-
-    try:
-        # Verify the ID token while checking if the token is revoked by
-        # passing check_revoked=True
-        decoded_token = auth.verify_id_token(id_token, check_revoked=True)
-        # Token is valid and not revoked
-        uid = decoded_token['uid']
+        return "unlabeled_text required", status.HTTP_400_BAD_REQUEST
     except ValueError:
-        return "Error: token malformed"
-    except auth.AuthError as exc:
-        if exc.code == 'ID_TOKEN_REVOKED':
-            return "Error: token revoked; user must reauthenticate or sign out"
-        else:
-            return "Error: token invalid"
-
-    # get the actual user from the uid
-    user = auth.get_user(uid)
-
-    # control access using custom claim
-    if user.custom_claims is None or user.custom_claims.get('admin') is not True:
-        # Prevent access to admin resource.
-        return "Error: user is not allowed to access this resource"
-
-    # verify prediction pre-requisites
-    # if len(cats) < 2:
-    if len(cats) < 2 or any(i < 3 for i in Counter(target).values()):
-        return "Error: not enough data to predict"
-
-    predictions = {}
-
-    # predict categories of given text
-    for key in request.args:
-        if key != 'id_token':
-            predictions[key] = (cats[gs_clf.predict([request.args[key]])[0]])
-
+        return "unlabeled_text unrecognized", status.HTTP_400_BAD_REQUEST
+    predicted_labels = classifier.predict(uid, unlabeled_text.values())
+    predictions = dict(zip(unlabeled_text.keys(), predicted_labels))
     return json.dumps(predictions)
 
-
-@app.route('/reset', methods=['GET'])
+@app.route('/reset', methods=['POST'])
 def reset():
-    # extract arguments from get request
+    """
+    Deletes all of the user's data from the database.
+    """
     try:
-        id_token = request.args['id_token']
+        id_token = request.form['id_token']
+        uid = verify_id_token(id_token)
     except KeyError:
-        return "Error: must specify the 'id_token' arg when making a GET to /reset"
-
-    try:
-        # Verify the ID token while checking if the token is revoked by
-        # passing check_revoked=True
-        decoded_token = auth.verify_id_token(id_token, check_revoked=True)
-        # Token is valid and not revoked
-        uid = decoded_token['uid']
+        return "id_token required", status.HTTP_400_BAD_REQUEST
     except ValueError:
-        return "Error: token malformed"
+        return "id_token unrecognized", status.HTTP_400_BAD_REQUEST
     except auth.AuthError as exc:
         if exc.code == 'ID_TOKEN_REVOKED':
-            return "Error: token revoked; user must re-authenticate or sign out"
+            return "id_token revoked", status.HTTP_400_BAD_REQUEST
         else:
-            return "Error: token invalid"
-
-    # get the actual user from the uid
-    user = auth.get_user(uid)
-
-    # control access using custom claim
-    print(user.custom_claims)
-    if user.custom_claims is None or user.custom_claims.get('admin') is not True:
-        # Prevent access to admin resource.
-        return "Error: user is not allowed to access this resource"
-
-    # clear in-memory data store
-    cats = []
-    data = []
-    target = []
-
-    return "cleared"
+            return "id_token invalid", status.HTTP_400_BAD_REQUEST
+    dal.delete(uid)
+    return "User data deleted", status.HTTP_202_ACCEPTED
