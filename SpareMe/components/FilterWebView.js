@@ -199,7 +199,11 @@ export default class FilterWebView extends React.Component {
                     (<TouchableOpacity style={styles.fullscreen}
                         onPress={this.removeFullscreen} />) : null
                 }
-                <BottomButtonBar ref='buttonBar' webView={this} style={{zIndex: 2}}/>
+                <BottomButtonBar
+                    {...this.props}
+                    ref='buttonBar'
+                    webView={this}
+                    style={{zIndex: 2}}/>
             </View>
         )
     }

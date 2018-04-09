@@ -57,6 +57,12 @@ def get_labeled_text(uid):
     targets = [labeled_text.label for labeled_text in all_labeled_text]
     return {'data': data, 'targets': targets}
 
+def get_labels(uid):
+    """
+    Get a list of all the given user's labels.
+    """
+    return [db_label.label for db_label in db_session.query(Label).filter_by(uid=uid)]
+
 def populate(uid):
     """
     Populates the database for the given user with sample data.

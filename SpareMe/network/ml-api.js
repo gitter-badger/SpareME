@@ -5,6 +5,7 @@
 const BASE_URL = "https://spareme.pw/";
 const ENDPOINT_ADD = "add";
 const ENDPOINT_PREDICT = "predict"
+const ENDPOINT_LABELS = "labels"
 const DEFAULT_CATEGORY = "harmless";
 
 /**
@@ -66,10 +67,23 @@ export function addTextToCategory(text, category, idToken) {
     });
 }
 
-export function getCategories(callback) {
-    // TODO get these from the API
-    fetch("http://google.com/").then(function(response) {
-        callback(['new category', 'harmelss', 'hateful', 'bananas', 'test', 'hokies', 'hello world']);
+export function getCategories(idToken, callback) {
+    let url = BASE_URL + ENDPOINT_LABELS;
+
+    var form = new FormData();
+    form.append('id_token', idToken);
+
+    let requestData = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        body: form
+    }
+
+    fetch(url, requestData).then(function(response) {
+        console.log('getCategories got response: ' + JSON.stringify(response._bodyText));
+        callback(JSON.parse(response._bodyText));
     }).catch(error => {
         console.log(error);
     });

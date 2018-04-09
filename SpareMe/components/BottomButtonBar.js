@@ -12,15 +12,15 @@ export default class BottomButtonBar extends React.Component {
             showFlagButton: false,
             showUnflagButton: false
         }
+    }
 
-        api.getCategories((response) => {
+    showCategories() {
+        api.getCategories(this.props.idToken, (response) => {
             this.setState({
                 categories: response
             });
         });
-    }
 
-    showCategories() {
         this.setState({
             showFlagButton: false,
             showUnflagButton: false,
