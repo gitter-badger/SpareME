@@ -58,7 +58,9 @@ export function addTextToCategory(text, category, idToken) {
         body: form
     }
 
-    fetch(url, requestData).catch(error => {
+    fetch(url, requestData).then(function(response) {
+        console.log('addTextToCategory got response: ' + JSON.stringify(response._bodyText));
+    }).catch(error => {
         console.log(error);
     });
 }
