@@ -40,7 +40,10 @@ export default class CreateAccount extends Component {
             const { code, message } = error;
             console.log(error);
             var alertMessage = 'Unable to create account.'
-            if (message.includes('email address')) {
+            if (message.includes('already in use')) {
+                alertMessage = constants.DUPLICATE_EMAIL;
+            }
+            else if (message.includes('email address')) {
                 alertMessage = constants.INVALID_EMAIL;
             }
             else if (message.includes('The given password')) {

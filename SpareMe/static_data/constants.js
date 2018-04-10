@@ -19,4 +19,5 @@ export const INCORRECT_EMAIL = 'There is no user record corresponding to this em
 export const INCORRECT_PASSWORD = 'The password does not match the one associated with this email.';
 export const INVALID_EMAIL = 'Please enter a valid email.';
 export const INVALID_PASSWORD = 'The password must contain...';
+export const DUPLICATE_EMAIL = 'This email address is associated with an existing account.';
 export const IPHONE_X_HEIGHT = 812;
