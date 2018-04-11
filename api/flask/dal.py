@@ -15,7 +15,7 @@ def get_label_id(uid, label_text):
     new label for the given label text to the database if it's not already
     there.
     """
-    label = db_session.query(Label).filter_by(label=label_text).first()
+    label = db_session.query(Label).filter_by(uid=uid, label=label_text).first()
     if not label:
         db_session.add(Label(uid=uid, label=label_text))
         db_session.commit()
