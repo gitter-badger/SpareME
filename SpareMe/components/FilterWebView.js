@@ -1,6 +1,6 @@
 'use strict';
 import React from 'react';
-import { StyleSheet, WebView, TouchableOpacity, Icon, View, Image, Text } from 'react-native';
+import { BackHandler, Icon, Image, Platform, StyleSheet, Text, TouchableOpacity, View, WebView } from 'react-native';
 import * as api from 'ml-api'
 import * as constants from 'constants'
 import { injectedJS } from './injected.js'
@@ -13,14 +13,33 @@ export default class FilterWebView extends React.Component {
         this.state = {
             showFullscreenOpacity: false
         }
+        this.onBackClicked = this.onBackClicked.bind(this);
+    }
+
+    componentWillMount() {
+        if (Platform.OS === 'android') {
+            BackHandler.addEventListener('hardwareBackPress', this.onBackClicked);
+        }
     }
 
     componentDidMount() {
-        this.props.onRef(this)
+        this.props.onRef(this);
     }
 
     componentWillUnmount() {
-        this.props.onRef(undefined)
+        this.props.onRef(undefined);
+        if (Platform.OS === 'android') {
+            BackHandler.removeEventListener("hardwareBackPress", this.onBackClicked);
+        }
+    }
+
+    onBackClicked = () => {
+        if (this.state.canGoBack) {
+            this.goBack();
+        } else {
+            BackHandler.exitApp();
+        }
+        return true;
     }
 
     /**
@@ -180,7 +199,8 @@ export default class FilterWebView extends React.Component {
             });
 
             this.setState({
-                showFullscreenOpacity: false
+                showFullscreenOpacity: false,
+                canGoBack: webState.canGoBack
             });
         }
     }
