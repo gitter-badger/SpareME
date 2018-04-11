@@ -71,12 +71,25 @@ export const injectedJS = `(${String(function() {
 
                 // Hide all elements in the selection range
                 var selectionRange = selection.getRangeAt(0);
-                var elementsInRangeParent = selectionRange.commonAncestorContainer
-                    .getElementsByClassName(INJECTED_CLASSNAME);
 
-                for (var i = 0, element; element = elementsInRangeParent[i]; i++) {
-                    if (selection.containsNode(element, true)) {
-                        hideElement(element);
+
+                if (selectionRange.commonAncestorContainer.getElementsByClassName) {
+                    // Multiple elements selected
+                    var elementsInRangeParent = selectionRange.commonAncestorContainer
+                        .getElementsByClassName(INJECTED_CLASSNAME);
+
+                    console.log(elementsInRangeParent);
+
+                    for (var i = 0, element; element = elementsInRangeParent[i]; i++) {
+                        if (selection.containsNode(element, true)) {
+                            hideElement(element);
+                        }
+                    }
+                } else { /* Single element selected */
+                    let selectedHTMLElement = window.getSelection().anchorNode.parentElement;
+
+                    if (selectedHTMLElement) {
+                        hideElement(selectedHTMLElement);
                     }
                 }
 
