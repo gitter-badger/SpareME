@@ -44,6 +44,7 @@ export default class Home extends Component {
                         user: user,
                         loading: false
                     });
+                    self.refresh();
                 })
                 .catch(function(error) {
                     console.log('authentication error: ' + error);
@@ -124,6 +125,7 @@ export default class Home extends Component {
           case constants.SIGN_OUT: //Sign Out
             console.log('User Logged Out');
             firebase.auth().signOut();
+            this.refresh();
             break;
           case constants.CREATE_ACCOUNT: // Create Account
           this.props.navigation.navigate('CreateAccount');
@@ -203,6 +205,7 @@ export default class Home extends Component {
                 <FilterWebView
                     source={{uri: this.state.url}}
                     idToken={this.state.idToken}
+                    user={this.state.user}
                     javaScriptEnabledAndroid={true}
                     navChangeHandler={this.navChangeHandler}
                     onError={this.webErrorHandler}
