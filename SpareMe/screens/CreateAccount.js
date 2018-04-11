@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Alert, StyleSheet, Text, View, Button, TextInput, NetInfo } from 'react-native';
 import CustomStatusBar from '../components/CustomStatusBar'
 import FilterWebView from '../components/FilterWebView'
+import Connectivity from '../components/Connectivity'
 import firebase from 'react-native-firebase';
 import * as constants from 'constants'
 
@@ -63,12 +64,7 @@ export default class CreateAccount extends Component {
     render() {
         if (!this.state.isConnected) {
             return(
-                <View style={styles.container}>
-                    <CustomStatusBar/>
-                    <View style={styles.connectionContainer}>
-                        <Text style={styles.connectionText}>Unable to connect. Please check your network settings.</Text>
-                    </View>
-                </View>
+                <Connectivity />
             );
         }
         return (

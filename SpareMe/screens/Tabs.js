@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Dimensions, StyleSheet, Text, View, ScrollView, NetInfo, Image, TouchableOpacity } from 'react-native';
 import CreateAccount from './CreateAccount'
 import SignIn from './SignIn'
+import Connectivity from '../components/Connectivity'
 import * as constants from 'constants'
 
 export default class Tabs extends Component {
@@ -56,11 +57,7 @@ export default class Tabs extends Component {
     render() {
         if (!this.state.isConnected) {
             return(
-                <View style={styles.container}>
-                    <View style={styles.connectionContainer}>
-                        <Text style={styles.connectionText}>Unable to connect. Please check your network settings.</Text>
-                    </View>
-                </View>
+                <Connectivity />
             );
         }
         return (
