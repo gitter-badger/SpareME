@@ -42,6 +42,7 @@ export default class Home extends Component {
                         idToken: result,
                         user: user
                     });
+                    self.refresh();
                 })
                 .catch(function(error) {
                     console.log('authentication error: ' + error);
@@ -119,6 +120,7 @@ export default class Home extends Component {
           case constants.SIGN_OUT: //Sign Out
             console.log('User Logged Out');
             firebase.auth().signOut();
+            this.refresh();
             break;
           case constants.CREATE_ACCOUNT: // Create Account
           this.props.navigation.navigate('CreateAccount');
