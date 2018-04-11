@@ -67,6 +67,7 @@ def populate(uid):
     """
     Populates the database for the given user with sample data.
     """
+    delete(uid)
     add_labeled_text(uid, 'harmless', 'hello')
     add_labeled_text(uid, 'harmless', 'world')
     add_labeled_text(uid, 'harmless', 'smile')
