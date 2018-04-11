@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     },
     menuText: {
         color: constants.COLOR_WHITE,
-        fontSize: 18,
+        fontSize: constants.TEXT_MEDIUM,
         margin: 5
     }
 });

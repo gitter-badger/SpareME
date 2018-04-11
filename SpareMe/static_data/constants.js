@@ -21,3 +21,7 @@ export const INVALID_EMAIL = 'Please enter a valid email.';
 export const INVALID_PASSWORD = 'The password must contain...';
 export const DUPLICATE_EMAIL = 'This email address is associated with an existing account.';
 export const IPHONE_X_HEIGHT = 812;
+export const TEXT_SMALL = 14;
+export const TEXT_MEDIUM = 16;
+export const TEXT_LARGE = 24;
+export const TEXT_HEADER = 32;

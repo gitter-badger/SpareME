@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     createView: {
         padding: 50,
         flex: 1,
-        backgroundColor: constants.COLOR_MAIN,
+        backgroundColor: constants.COLOR_MAIN
     },
     buttonContainer: {
         flex: 1,
@@ -165,21 +165,21 @@ const styles = StyleSheet.create({
     },
     connectionText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24
+        fontSize: constants.TEXT_LARGE
     },
     createText: {
         color: constants.COLOR_WHITE,
-        fontSize: 32,
+        fontSize: constants.TEXT_HEADER,
         marginBottom: 20
     },
     headerText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24,
+        fontSize: constants.TEXT_LARGE,
         marginBottom: 5
     },
     input: {
         alignSelf: 'stretch',
-        fontSize: 16,
+        fontSize: constants.TEXT_MEDIUM,
         marginBottom: 10,
         color: constants.COLOR_WHITE
     }

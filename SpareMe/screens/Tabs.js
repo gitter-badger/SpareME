@@ -82,20 +82,22 @@ export default class Tabs extends Component {
                 </ScrollView>
                 <View style={[styles.iconContainer, {width: this.state.layout.width}]}>
                     <TouchableOpacity
-                        style={styles.iconButtom}
+                        style={styles.iconButton}
                         onPress={ () => {
                             this.refs.scrollView.scrollTo({x: 0, y: 0, animated: true})
                         }
                     }>
                         <Image source={require('./account.png')} style={[styles.icon, this.state.firstPage ? null : styles.disabled]}/>
+                        <Text style={styles.iconText}>Sign In</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={styles.iconButtom}
+                        style={styles.iconButton}
                         onPress={ () => {
                             this.refs.scrollView.scrollTo({x: this.state.layout.width, y: 0, animated: true})
                         }
                     }>
                         <Image source={require('./create.png')} style={[styles.icon, this.state.firstPage ? styles.disabled : null]}/>
+                        <Text style={styles.iconText}>Create Account</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -118,10 +120,10 @@ const styles = StyleSheet.create({
     },
     connectionText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24
+        fontSize: constants.TEXT_LARGE
     },
     iconContainer: {
-        height: 50,
+        height: 65,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-around',
@@ -130,10 +132,12 @@ const styles = StyleSheet.create({
         bottom: 10
     },
     iconButton: {
-        height: 35,
-        width: 35,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    iconText: {
+        color: constants.COLOR_WHITE,
+        fontSize: constants.TEXT_SMALL
     },
     icon: {
         flex: 1,

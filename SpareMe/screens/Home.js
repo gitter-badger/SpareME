@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     },
     connectionText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24
+        fontSize: constants.TEXT_LARGE
     },
     fullscreen: {
         height: '100%',
