@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     },
     flagButtonText: {
         color: 'white',
-        fontSize: 15,
+        fontSize: constants.TEXT_SMALL,
         textAlign: 'center'
     },
     image: {

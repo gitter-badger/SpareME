@@ -32,7 +32,7 @@ export default class CreateAccount extends Component {
         const { email, password } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
         .then((user) => {
-          this.props.navigation.goBack();
+          this.props.isATab ? this.props.navigateHome() : this.props.navigation.goBack();
             // If you need to do anything with the user, do it here
             // The user will be logged in automatically by the
             // `onAuthStateChanged` listener we set up in App.js earlier
@@ -40,7 +40,10 @@ export default class CreateAccount extends Component {
             const { code, message } = error;
             console.log(error);
             var alertMessage = 'Unable to create account.'
-            if (message.includes('email address')) {
+            if (message.includes('already in use')) {
+                alertMessage = constants.DUPLICATE_EMAIL;
+            }
+            else if (message.includes('email address')) {
                 alertMessage = constants.INVALID_EMAIL;
             }
             else if (message.includes('The given password')) {
@@ -110,19 +113,21 @@ export default class CreateAccount extends Component {
                     />
 
                     <View style={styles.buttonContainer}>
-                        <View style={styles.leftButton}>
+                        <View style={styles.button}>
                             <Button
                                 title='Create Account'
                                 onPress={this.onRegister}
                             />
                         </View>
-                        <View style={styles.button}>
-                            <Button
-                                title='Cancel'
-                                onPress={() => this.props.navigation.goBack()}
-                                color='red'
-                            />
-                        </View>
+                        { this.props.isATab ? null : (
+                            <View style={styles.button}>
+                                <Button
+                                    title='Cancel'
+                                    onPress={() => this.props.navigation.goBack()}
+                                    color='red'
+                                />
+                            </View>
+                        )}
                     </View>
                 </View>
             </View>
@@ -138,7 +143,7 @@ const styles = StyleSheet.create({
     createView: {
         padding: 50,
         flex: 1,
-        backgroundColor: constants.COLOR_MAIN,
+        backgroundColor: constants.COLOR_MAIN
     },
     buttonContainer: {
         flex: 1,
@@ -146,14 +151,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 20
     },
-    leftButton: {
-        flex: 1,
-        height: 40,
-        marginRight: 10
-    },
     button: {
         flex: 1,
-        height: 40
+        height: 40,
+        margin: 5
     },
     connectionContainer: {
         flex: 1,
@@ -164,21 +165,21 @@ const styles = StyleSheet.create({
     },
     connectionText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24
+        fontSize: constants.TEXT_LARGE
     },
     createText: {
         color: constants.COLOR_WHITE,
-        fontSize: 32,
+        fontSize: constants.TEXT_HEADER,
         marginBottom: 20
     },
     headerText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24,
+        fontSize: constants.TEXT_LARGE,
         marginBottom: 5
     },
     input: {
         alignSelf: 'stretch',
-        fontSize: 16,
+        fontSize: constants.TEXT_MEDIUM,
         marginBottom: 10,
         color: constants.COLOR_WHITE
     }

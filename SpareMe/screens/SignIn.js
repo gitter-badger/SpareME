@@ -32,7 +32,8 @@ export default class SignIn extends Component {
         const { email, password } = this.state;
         firebase.auth().signInWithEmailAndPassword(email, password)
         .then((user) => {
-            this.props.navigation.goBack();
+            console.log(this.props);
+            this.props.isATab ? this.props.navigateHome() : this.props.navigation.goBack();
             // If you need to do anything with the user, do it here
             // The user will be logged in automatically by the
             // `onAuthStateChanged` listener we set up in App.js earlier
@@ -54,21 +55,6 @@ export default class SignIn extends Component {
               ],
               { cancelable: false }
             )
-        });
-    }
-
-    onRegister = () => {
-        const { email, password } = this.state;
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then((user) => {
-            // If you need to do anything with the user, do it here
-            // The user will be logged in automatically by the
-            // `onAuthStateChanged` listener we set up in App.js earlier
-        }).catch((error) => {
-            const { code, message } = error;
-            // For details of error codes, see the docs
-            // The message contains the default Firebase string
-            // representation of the error
         });
     }
 
@@ -125,19 +111,21 @@ export default class SignIn extends Component {
                     />
 
                     <View style={styles.buttonContainer}>
-                        <View style={styles.leftButton}>
+                        <View style={styles.button}>
                             <Button
                                 title='Sign In'
                                 onPress={this.onLogin}
                             />
                         </View>
-                        <View style={styles.button}>
-                            <Button
-                                title='Cancel'
-                                onPress={() => this.props.navigation.goBack()}
-                                color='red'
-                            />
-                        </View>
+                        { this.props.isATab ? null : (
+                            <View style={styles.button}>
+                                <Button
+                                    title='Cancel'
+                                    onPress={() => this.props.navigation.goBack()}
+                                    color='red'
+                                />
+                            </View>
+                        )}
                     </View>
                 </View>
             </View>
@@ -161,14 +149,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 20
     },
-    leftButton: {
-        flex: 1,
-        height: 40,
-        marginRight: 10
-    },
     button: {
         flex: 1,
-        height: 40
+        height: 40,
+        margin: 5
     },
     connectionContainer: {
         flex: 1,
@@ -179,21 +163,21 @@ const styles = StyleSheet.create({
     },
     connectionText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24
+        fontSize: constants.TEXT_LARGE
     },
     signInText: {
         color: constants.COLOR_WHITE,
-        fontSize: 32,
+        fontSize: constants.TEXT_HEADER,
         marginBottom: 20
     },
     headerText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24,
+        fontSize: constants.TEXT_LARGE,
         marginBottom: 5
     },
     input: {
         alignSelf: 'stretch',
-        fontSize: 16,
+        fontSize: constants.TEXT_MEDIUM,
         marginBottom: 10,
         color: constants.COLOR_WHITE
     }

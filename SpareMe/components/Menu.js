@@ -8,7 +8,6 @@ class Menu extends Component {
     render() {
         const {menuHandler} = this.props;
         const user = firebase.auth().currentUser;
-        console.log(user);
         const val1 = user == null ? constants.SIGN_IN : constants.SIGN_OUT;
         const val2 = user == null ? constants.CREATE_ACCOUNT : constants.SETTINGS;
         return (
@@ -49,7 +48,7 @@ const styles = StyleSheet.create({
     },
     menuText: {
         color: constants.COLOR_WHITE,
-        fontSize: 18,
+        fontSize: constants.TEXT_MEDIUM,
         margin: 5
     }
 });

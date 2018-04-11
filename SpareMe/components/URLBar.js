@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,
-        fontSize: 14
+        fontSize: constants.TEXT_SMALL
     }
 });
 

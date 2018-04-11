@@ -5,6 +5,7 @@ import Home from './screens/Home'
 import SignIn from './screens/SignIn'
 import CreateAccount from './screens/CreateAccount'
 import Settings from './screens/Settings'
+import Tabs from './screens/Tabs'
 
 export default class App extends Component {
     render() {
@@ -26,6 +27,9 @@ const RootStack = StackNavigator(
         Settings: {
             screen: Settings,
         },
+        Tabs: {
+            screen: Tabs
+        }
     },
     {
         initialRouteName: 'Home',

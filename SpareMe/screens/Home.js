@@ -33,6 +33,7 @@ export default class Home extends Component {
         NetInfo.isConnected.addEventListener('connectionChange', this.onConnectivityChange);
         var self = this;
         this.authSubscription = firebase.auth().onAuthStateChanged((user) => {
+            console.log(user);
             if (user) {
                 console.log(user.email + ' user authenticated');
                 user.getIdToken(/* forceRefresh */ true)
@@ -40,17 +41,21 @@ export default class Home extends Component {
                     console.log('got idToken: ' + result);
                     self.setState({
                         idToken: result,
-                        user: user
+                        user: user,
+                        loading: false
                     });
                 })
                 .catch(function(error) {
                     console.log('authentication error: ' + error);
                 });
             }
-            self.setState({
-                loading: false,
-                user: null,
-            });
+            else {
+                self.setState({
+                    loading: false,
+                    user: null,
+                });
+                this.props.navigation.navigate('Tabs');
+            }
         });
     }
 
@@ -231,13 +236,14 @@ const styles = StyleSheet.create({
     },
     connectionText: {
         color: constants.COLOR_WHITE,
-        fontSize: 24
+        fontSize: constants.TEXT_LARGE
     },
     fullscreen: {
         height: '100%',
         width: '100%',
         zIndex: 5,
-        position: 'absolute'
+        position: 'absolute',
+        backgroundColor: '#77777777'
     },
     menu: {
         width: '75%',
