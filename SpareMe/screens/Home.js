@@ -198,6 +198,7 @@ export default class Home extends Component {
                 <FilterWebView
                     source={{uri: this.state.url}}
                     idToken={this.state.idToken}
+                    user={this.state.user}
                     javaScriptEnabledAndroid={true}
                     navChangeHandler={this.navChangeHandler}
                     onError={this.webErrorHandler}

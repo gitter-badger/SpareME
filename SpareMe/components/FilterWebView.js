@@ -191,7 +191,7 @@ export default class FilterWebView extends React.Component {
                 <WebView
                     {...this.props}
                     ref='webView'
-                    injectedJavaScript={injectedJS}
+                    injectedJavaScript={this.props.user ? injectedJS : null}
                     onNavigationStateChange={this.navChangeHandler}
                     onMessage={e => this.onMessage(e.nativeEvent.data)}
                 />
