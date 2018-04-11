@@ -5,13 +5,16 @@ import CreateAccount from './CreateAccount'
 import SignIn from './SignIn'
 import * as constants from 'constants'
 
-const dims = Dimensions.get('window');
-const { width, height } = dims;
-
 export default class Tabs extends Component {
     constructor(props) {
         super(props);
-        this.state = {firstPage: true};
+        this.state = {
+            firstPage: true,
+            layout: {
+                width: Dimensions.get('window').width,
+                height: Dimensions.get('window').height
+            }
+        };
         NetInfo.isConnected.fetch().then(isConnected => {
             this.setState({isConnected: isConnected});
         });
@@ -32,13 +35,21 @@ export default class Tabs extends Component {
     }
 
     navigateHome = () => {
-        console.log(this)
         this.props.navigation.navigate('Home');
     }
 
     onScroll = (event) => {
         this.setState({
-            firstPage: (event.nativeEvent.contentOffset.x < width/2)
+            firstPage: (event.nativeEvent.contentOffset.x < this.state.layout.width/2)
+        });
+    }
+
+    onLayout = (event) => {
+        this.setState({
+            layout:{
+                height: event.nativeEvent.layout.height,
+                width: event.nativeEvent.layout.width,
+            }
         });
     }
 
@@ -53,7 +64,7 @@ export default class Tabs extends Component {
             );
         }
         return (
-            <View style={styles.container}>
+            <View style={styles.container} onLayout={this.onLayout}>
                 <ScrollView
                     ref='scrollView'
                     horizontal={true}
@@ -62,14 +73,14 @@ export default class Tabs extends Component {
                     onScroll={this.onScroll}
                     scrollEventThrottle={16}
                 >
-                    <View style={styles.tabContainer}>
+                    <View style={{height: this.state.layout.height, width: this.state.layout.width}}>
                         <SignIn isATab={true} navigateHome={this.navigateHome} />
                     </View>
-                    <View style={styles.tabContainer}>
+                    <View style={{height: this.state.layout.height, width: this.state.layout.width}}>
                         <CreateAccount isATab={true} navigateHome={this.navigateHome} />
                     </View>
                 </ScrollView>
-                <View style={styles.iconContainer}>
+                <View style={[styles.iconContainer, {width: this.state.layout.width}]}>
                     <TouchableOpacity
                         style={styles.iconButtom}
                         onPress={ () => {
@@ -81,7 +92,7 @@ export default class Tabs extends Component {
                     <TouchableOpacity
                         style={styles.iconButtom}
                         onPress={ () => {
-                            this.refs.scrollView.scrollTo({x: width, y: 0, animated: true})
+                            this.refs.scrollView.scrollTo({x: this.state.layout.width, y: 0, animated: true})
                         }
                     }>
                         <Image source={require('./create.png')} style={[styles.icon, this.state.firstPage ? styles.disabled : null]}/>
@@ -109,13 +120,8 @@ const styles = StyleSheet.create({
         color: constants.COLOR_WHITE,
         fontSize: 24
     },
-    tabContainer: {
-        height: height,
-        width: width
-    },
     iconContainer: {
         height: 50,
-        width: width,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-around',
