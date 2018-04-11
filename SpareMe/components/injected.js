@@ -60,18 +60,18 @@ export const injectedJS = `(${String(function() {
                 break;
 
             case 'selectionFlagged':
+                snapSelectionToWord();
                 let category = action['category'];
                 let selection = window.getSelection();
 
                 window.postMessage(JSON.stringify({
                     messageType: 'addTextToAPI',
-                    text : selection.toString(),
+                    text : window.getSelection().toString(),
                     category: category
                 }));
 
                 // Hide all elements in the selection range
                 var selectionRange = selection.getRangeAt(0);
-
 
                 if (selectionRange.commonAncestorContainer.getElementsByClassName) {
                     // Multiple elements selected
@@ -205,6 +205,47 @@ export const injectedJS = `(${String(function() {
             content : window.getSelection().toString(),
             isHiddenElement: isHiddenElement
         }));
+    }
+
+    /**
+    * Snaps the current selection to the nearest white space.
+    *
+    * Adapted from http://jsfiddle.net/3RAkZ/
+    */
+    function snapSelectionToWord() {
+        var sel = window.getSelection();
+        if (sel.isCollapsed) {
+            return;
+        }
+
+        var range = document.createRange();
+
+        // Get absolute range of selection
+        range.setStart(sel.anchorNode, sel.anchorOffset);
+        range.setEnd(sel.focusNode, sel.focusOffset);
+
+        // Detect if selection is backwards
+        var backwards = range.collapsed;
+        range.detach();
+
+        var endNode = sel.focusNode
+        var endOffset = sel.focusOffset;
+        sel.collapse(sel.anchorNode, sel.anchorOffset);
+
+        if (backwards) {
+            sel.modify("move", "backward", "character");
+            sel.modify("move", "forward", "word");
+            sel.extend(endNode, endOffset);
+            sel.modify("extend", "forward", "character");
+            sel.modify("extend", "backward", "word");
+
+        } else {
+            sel.modify("move", "forward", "character");
+            sel.modify("move", "backward", "word");
+            sel.extend(endNode, endOffset);
+            sel.modify("extend", "backward", "character");
+            sel.modify("extend", "forward", "word");
+        }
     }
 
     function analyzePage() {
