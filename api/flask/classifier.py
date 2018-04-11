@@ -49,6 +49,7 @@ def predict(uid, unlabeled_text):
     TODO: get the given user's actual classifier from persistence and use that
     rather than using the global classifier.
     """
+    global initialized
     if not initialized:
         return ['harmless' for _ in unlabeled_text]
     predicted_ids = gs_clf.predict(unlabeled_text)
