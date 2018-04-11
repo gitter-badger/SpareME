@@ -60,22 +60,26 @@ export const injectedJS = `(${String(function() {
                 break;
 
             case 'selectionFlagged':
-                let selectedHTMLElement = window.getSelection().anchorNode.parentElement;
                 let category = action['category'];
+                let selection = window.getSelection();
 
-                if (selectedHTMLElement) {
-                    // Hide the selected element on the page
-                    hideElement(selectedHTMLElement);
+                window.postMessage(JSON.stringify({
+                    messageType: 'addTextToAPI',
+                    text : selection.toString(),
+                    category: category
+                }));
 
-                    // Alert React that the user hid an element
-                    window.postMessage(JSON.stringify({
-                        messageType: 'addTextToAPI',
-                        text : String(selectedHTMLElement.tagName === 'img' ?
-                            selectedHTMLElement.alt :
-                            selectedHTMLElement.innerText),
-                        category: category
-                    }));
+                // Hide all elements in the selection range
+                var selectionRange = selection.getRangeAt(0);
+                var elementsInRangeParent = selectionRange.commonAncestorContainer
+                    .getElementsByClassName(INJECTED_CLASSNAME);
+
+                for (var i = 0, element; element = elementsInRangeParent[i]; i++) {
+                    if (selection.containsNode(element, true)) {
+                        hideElement(element);
+                    }
                 }
+
                 break;
 
             case 'selectionUnflagged':
@@ -209,6 +213,9 @@ export const injectedJS = `(${String(function() {
             let addedClass = INJECTED_CLASSNAME + injectedClassCounter;
             injectedClassCounter += 1;
             element.classList.add(addedClass);
+
+            // Add non-unique class for easy grouping without regex
+            element.classList.add(INJECTED_CLASSNAME)
 
             // Map the added class name to the element's innerText
             predictionGroup[addedClass] = String(element.tagName === 'img' ? element.alt : element.innerText)
