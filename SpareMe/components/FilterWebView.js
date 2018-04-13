@@ -171,8 +171,8 @@ export default class FilterWebView extends React.Component {
     }
 
     navChangeHandler = (webState) => {
-        this.props.navChangeHandler(webState);
         if (!webState.url.includes('react-js-navigation://postMessage')) {
+            this.props.navChangeHandler(webState);
             this.refs.buttonBar.setState({
                 showFlagButton: false,
                 showUnflagButton: false,
