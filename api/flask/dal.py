@@ -36,11 +36,8 @@ def add_labeled_text(uid, label_text, text):
     """
     Adds the given text to the database for a user, labeled with the given
     label text.
-
-    TODO: if the text is already labeled with a different label, we must remove
-    the existing copy before adding this new one. If it's already labeled with
-    the same label, then we don't need to add it at all.
     """
+    db_session.query(LabeledText).filter_by(uid=uid, text=text).delete()
     label_id = get_label_id(uid, label_text)
     labeled_text = LabeledText(timestamp=datetime.now(), uid=uid, label=label_id, text=text)
     db_session.add(labeled_text)
