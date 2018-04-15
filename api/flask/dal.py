@@ -1,6 +1,7 @@
 from datetime import datetime
 from models import Label, LabeledText, Classifier
 from database import db_session
+import pickle
 
 # Create the database tables if they don't already exist
 import database
@@ -25,12 +26,11 @@ def get_label_id(uid, label_text):
 def get_label_text(uid, label_id):
     """
     Get the text of the label with the given label id from the database.
-
-    TODO: we can probably use caching to speed this up since we don't allow
-    labels to be deleted and therefore can avoid hitting the db unless the
-    cache doesn't contain the given id.
     """
-    return db_session.query(Label).filter_by(uid=uid, id=label_id).first().label
+    label = db_session.query(Label).filter_by(uid=uid, id=label_id).first()
+    if not label:
+        return None
+    return label.label
 
 def add_labeled_text(uid, label_text, text):
     """
@@ -89,3 +89,21 @@ def delete(uid):
     db_session.query(Label).filter_by(uid=uid).delete()
     db_session.query(Classifier).filter_by(uid=uid).delete()
     db_session.commit()
+
+def update_classifier(uid, model):
+    """
+    Persists the user's classifier to the database.
+    """
+    classifier = Classifier(timestamp=datetime.now(), uid=uid, model=model)
+    db_session.query(Classifier).filter_by(uid=uid).delete()
+    db_session.add(classifier)
+    db_session.commit()
+
+def get_classifier(uid):
+    """
+    Gets the user's classifier from the database.
+    """
+    classifier = db_session.query(Classifier).filter_by(uid=uid).first()
+    if not classifier:
+        return None
+    return classifier.model
