@@ -111,6 +111,7 @@ export default class SignIn extends Component {
                             <Button
                                 title='Sign In'
                                 onPress={this.onLogin}
+                                color={constants.COLOR_POSITIVE}
                             />
                         </View>
                         { this.props.isATab ? null : (
@@ -118,7 +119,7 @@ export default class SignIn extends Component {
                                 <Button
                                     title='Cancel'
                                     onPress={() => this.props.navigation.goBack()}
-                                    color='red'
+                                    color={constants.COLOR_NEGATIVE}
                                 />
                             </View>
                         )}

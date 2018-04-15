@@ -113,6 +113,7 @@ export default class CreateAccount extends Component {
                             <Button
                                 title='Create Account'
                                 onPress={this.onRegister}
+                                color={constants.COLOR_POSITIVE}
                             />
                         </View>
                         { this.props.isATab ? null : (
@@ -120,7 +121,7 @@ export default class CreateAccount extends Component {
                                 <Button
                                     title='Cancel'
                                     onPress={() => this.props.navigation.goBack()}
-                                    color='red'
+                                    color={constants.COLOR_NEGATIVE}
                                 />
                             </View>
                         )}
