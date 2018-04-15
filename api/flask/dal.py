@@ -27,7 +27,10 @@ def get_label_text(uid, label_id):
     """
     Get the text of the label with the given label id from the database.
     """
-    return db_session.query(Label).filter_by(uid=uid, id=label_id).first().label
+    label = db_session.query(Label).filter_by(uid=uid, id=label_id).first()
+    if not label:
+        return None
+    return label.label
 
 def add_labeled_text(uid, label_text, text):
     """
