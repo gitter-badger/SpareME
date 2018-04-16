@@ -85,7 +85,7 @@ export default class Tabs extends Component {
                         }
                     }>
                         <Image source={require('./account.png')} style={[styles.icon, this.state.firstPage ? null : styles.disabled]}/>
-                        <Text style={styles.iconText}>Sign In</Text>
+                        <Text style={[styles.iconText, this.state.firstPage ? null : styles.disabledText]}>Sign In</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.iconButton}
@@ -94,7 +94,7 @@ export default class Tabs extends Component {
                         }
                     }>
                         <Image source={require('./create.png')} style={[styles.icon, this.state.firstPage ? styles.disabled : null]}/>
-                        <Text style={styles.iconText}>Create Account</Text>
+                        <Text style={[styles.iconText, this.state.firstPage ? styles.disabledText : null]}>Create Account</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -143,5 +143,8 @@ const styles = StyleSheet.create({
     },
     disabled: {
         tintColor: constants.COLOR_DISABLED
+    },
+    disabledText: {
+        color: constants.COLOR_DISABLED
     }
 });

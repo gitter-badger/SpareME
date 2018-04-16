@@ -156,6 +156,10 @@ export default class FilterWebView extends React.Component {
         this.refs.buttonBar.setState({
             showCategories: false
         });
+
+        this.setState({
+            showFullscreenOpacity: false
+        });
     }
 
     onUnflagButtonPress = () => {

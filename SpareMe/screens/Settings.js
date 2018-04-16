@@ -69,12 +69,13 @@ export default class Settings extends Component {
                             <Button
                                 title='Delete Account'
                                 onPress={this.onDelete}
+                                color={constants.COLOR_POSITIVE}
                             />
                         </View>
                         <View style={styles.button}>
                             <Button
                                 title='Cancel'
-                                color={'red'}
+                                color={constants.COLOR_NEGATIVE}
                                 onPress={() => this.props.navigation.goBack()}
                             />
                         </View>

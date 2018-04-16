@@ -1,15 +1,19 @@
 /**
  * @providesModule constants
  */
-
+const BLUE = '#6096ba';
+const GREEN = '#32de8a';
+const RED = '#c73e1d';
 export const HATEFUL = 'hateful';
 export const INJECTED_CLASSNAME = 'SpareMeElement';
 export const POST_MESSAGE = 'postMessage';
-export const COLOR_MAIN = '#6adbb5';
-export const COLOR_SECONDARY = '#326771';
-export const COLOR_DISABLED = '#e0e0e0';
+export const COLOR_MAIN = BLUE;
+export const COLOR_SECONDARY = RED;
+export const COLOR_DISABLED = '#aaaacc';
 export const COLOR_WHITE = '#fffcf9';
 export const COLOR_GRAY = '#666666';
+export const COLOR_POSITIVE = GREEN;
+export const COLOR_NEGATIVE = RED;
 export const GOOGLE_SEARCH = 'https://www.google.com/search?q=';
 export const SIGN_IN = 1;
 export const SIGN_OUT = 2;
