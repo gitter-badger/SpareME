@@ -12,7 +12,6 @@ export default class SignIn extends Component {
         super(props);
         this.state = {};
         NetInfo.isConnected.fetch().then(isConnected => {
-            console.log(isConnected);
             this.setState({isConnected: isConnected});
         });
     }
@@ -33,7 +32,6 @@ export default class SignIn extends Component {
         const { email, password } = this.state;
         firebase.auth().signInWithEmailAndPassword(email, password)
         .then((user) => {
-            console.log(this.props);
             this.props.navigateHome();
             // If you need to do anything with the user, do it here
             // The user will be logged in automatically by the

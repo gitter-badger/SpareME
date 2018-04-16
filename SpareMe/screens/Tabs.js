@@ -1,9 +1,8 @@
 'use strict';
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, View, ScrollView, NetInfo, Image, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
 import CreateAccount from './CreateAccount'
 import SignIn from './SignIn'
-import Connectivity from '../components/Connectivity'
 import * as constants from 'constants'
 
 export default class Tabs extends Component {
@@ -16,23 +15,6 @@ export default class Tabs extends Component {
                 height: Dimensions.get('window').height
             }
         };
-        NetInfo.isConnected.fetch().then(isConnected => {
-            this.setState({isConnected: isConnected});
-        });
-    }
-
-    componentDidMount() {
-        NetInfo.isConnected.addEventListener('connectionChange', this.onConnectivityChange);
-    }
-
-    componentWillUnmount() {
-        NetInfo.removeEventListener('connectionChange', this.onConnectivityChange);
-    }
-
-    onConnectivityChange = isConnected => {
-        if (isConnected) {
-            this.setState({isConnected: isConnected});
-        }
     }
 
     navigateHome = () => {
@@ -40,7 +22,6 @@ export default class Tabs extends Component {
     }
 
     navigateTutorial = () => {
-        console.log('NAVIGATE TUTORIAL')
         this.props.navigation.navigate('Tutorial', {fromCreate: true});
     }
 
@@ -60,11 +41,6 @@ export default class Tabs extends Component {
     }
 
     render() {
-        if (!this.state.isConnected) {
-            return(
-                <Connectivity />
-            );
-        }
         return (
             <View style={styles.container} onLayout={this.onLayout}>
                 <ScrollView

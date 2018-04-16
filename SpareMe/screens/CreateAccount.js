@@ -12,7 +12,6 @@ export default class CreateAccount extends Component {
         super(props);
         this.state = {};
         NetInfo.isConnected.fetch().then(isConnected => {
-            console.log(isConnected);
             this.setState({isConnected: isConnected});
         });
     }

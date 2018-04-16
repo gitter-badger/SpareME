@@ -20,6 +20,9 @@ export default class Home extends Component {
             loading: true,
             menu: false
         };
+        if (firebase.auth().currentUser == null) {
+          this.props.navigation.navigate('Tabs');
+        }
         NetInfo.isConnected.fetch().then(isConnected => {
             this.setState({isConnected: isConnected});
         });
@@ -35,8 +38,8 @@ export default class Home extends Component {
         NetInfo.isConnected.addEventListener('connectionChange', this.onConnectivityChange);
         var self = this;
         this.authSubscription = firebase.auth().onAuthStateChanged((user) => {
-            console.log(user);
             if (user) {
+                this.shouldNavigate = true;
                 console.log(user.email + ' user authenticated');
                 user.getIdToken(/* forceRefresh */ true)
                 .then(function(result) {
@@ -53,7 +56,6 @@ export default class Home extends Component {
                 });
             }
             else {
-                this.props.navigation.navigate('Tabs');
                 self.setState({
                     loading: false,
                     user: null,
@@ -123,21 +125,20 @@ export default class Home extends Component {
     }
 
     menuHandler = (value) => {
-    switch(value) {
-        case constants.SIGN_OUT: //Sign Out
-            console.log('User Logged Out');
-            firebase.auth().signOut();
-            this.props.navigation.navigate('Tabs');
-            break;
-        case constants.SETTINGS: // Settings
-            this.props.navigation.navigate('Settings');
-            break;
-        case constants.TUTORIAL: // Tutorial
-            this.props.navigation.navigate('Tutorial');
-            break;
-        default:
-            break;
-    }
+        switch(value) {
+            case constants.SIGN_OUT: //Sign Out
+                this.props.navigation.navigate('Tabs');
+                firebase.auth().signOut();
+                break;
+            case constants.SETTINGS: // Settings
+                this.props.navigation.navigate('Settings');
+                break;
+            case constants.TUTORIAL: // Tutorial
+                this.props.navigation.navigate('Tutorial');
+                break;
+            default:
+                break;
+        }
     }
 
     renderError = () => {
