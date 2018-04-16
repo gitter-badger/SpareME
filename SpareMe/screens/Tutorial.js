@@ -1,9 +1,8 @@
 'use strict';
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, View, ScrollView, NetInfo, Image, TouchableOpacity } from 'react-native';
-import CreateAccount from './CreateAccount'
-import SignIn from './SignIn'
+import { Dimensions, StyleSheet, Text, View, ScrollView, NetInfo, TouchableOpacity } from 'react-native';
 import Connectivity from '../components/Connectivity'
+import CustomStatusBar from '../components/CustomStatusBar'
 import * as constants from 'constants'
 
 export default class Tabs extends Component {
@@ -35,15 +34,6 @@ export default class Tabs extends Component {
         }
     }
 
-    navigateHome = () => {
-        this.props.navigation.navigate('Home');
-    }
-
-    navigateTutorial = () => {
-        console.log('NAVIGATE TUTORIAL')
-        this.props.navigation.navigate('Tutorial', {fromCreate: true});
-    }
-
     onScroll = (event) => {
         this.setState({
             firstPage: (event.nativeEvent.contentOffset.x < this.state.layout.width/2)
@@ -59,6 +49,20 @@ export default class Tabs extends Component {
         });
     }
 
+    donePressed = () => {
+        if (this.props.navigation.state.params) {
+            if (this.props.navigation.state.params.fromCreate) {
+                this.props.navigation.navigate('Home');
+            }
+            else {
+                this.props.navigation.goBack();
+            }
+        }
+        else {
+            this.props.navigation.goBack();
+        }
+    }
+
     render() {
         if (!this.state.isConnected) {
             return(
@@ -67,6 +71,7 @@ export default class Tabs extends Component {
         }
         return (
             <View style={styles.container} onLayout={this.onLayout}>
+                <CustomStatusBar />
                 <ScrollView
                     ref='scrollView'
                     horizontal={true}
@@ -75,32 +80,21 @@ export default class Tabs extends Component {
                     onScroll={this.onScroll}
                     scrollEventThrottle={16}
                 >
-                    <View style={{height: this.state.layout.height, width: this.state.layout.width}}>
-                        <SignIn isATab={true} navigateHome={this.navigateHome} />
+                    <View style={[styles.pageContainer, {height: this.state.layout.height, width: this.state.layout.width}]}>
+                        <Text style={styles.progressText}>{"1. Highlight and flag the content that you don't want to see."}</Text>
                     </View>
-                    <View style={{height: this.state.layout.height, width: this.state.layout.width}}>
-                        <CreateAccount isATab={true} navigateTutorial={this.navigateTutorial} />
+                    <View style={[styles.pageContainer, {height: this.state.layout.height, width: this.state.layout.width}]}>
+                        <Text style={styles.progressText}>2. Choose the category</Text>
+                        <TouchableOpacity
+                            onPress={this.donePressed}
+                        >
+                            <Text style={styles.progressText}>Done</Text>
+                        </TouchableOpacity>
+
                     </View>
                 </ScrollView>
-                <View style={[styles.iconContainer, {width: this.state.layout.width}]}>
-                    <TouchableOpacity
-                        style={styles.iconButton}
-                        onPress={ () => {
-                            this.refs.scrollView.scrollTo({x: 0, y: 0, animated: true})
-                        }
-                    }>
-                        <Image source={require('./account.png')} style={[styles.icon, this.state.firstPage ? null : styles.disabled]}/>
-                        <Text style={[styles.iconText, this.state.firstPage ? null : styles.disabledText]}>Sign In</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.iconButton}
-                        onPress={ () => {
-                            this.refs.scrollView.scrollTo({x: this.state.layout.width, y: 0, animated: true})
-                        }
-                    }>
-                        <Image source={require('./create.png')} style={[styles.icon, this.state.firstPage ? styles.disabled : null]}/>
-                        <Text style={[styles.iconText, this.state.firstPage ? styles.disabledText : null]}>Create Account</Text>
-                    </TouchableOpacity>
+                <View style={[styles.progressContainer, {width: this.state.layout.width}]}>
+                    <Text style={styles.progressText}>Swipe to Continue</Text>
                 </View>
             </View>
 
@@ -113,20 +107,19 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: constants.COLOR_MAIN
     },
-    iconContainer: {
-        height: 65,
-        flexDirection: 'row',
+    pageContainer: {
+        flex: 1,
         alignItems: 'center',
-        justifyContent: 'space-around',
+        justifyContent: 'center',
+    },
+    progressContainer: {
+        height: 65,
+        alignItems: 'center',
         zIndex: 2,
         position: 'absolute',
         bottom: 10
     },
-    iconButton: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    iconText: {
+    progressText: {
         color: constants.COLOR_WHITE,
         fontSize: constants.TEXT_SMALL
     },
@@ -134,11 +127,5 @@ const styles = StyleSheet.create({
         flex: 1,
         aspectRatio: 1,
         resizeMode: 'contain'
-    },
-    disabled: {
-        tintColor: constants.COLOR_DISABLED
-    },
-    disabledText: {
-        color: constants.COLOR_DISABLED
     }
 });

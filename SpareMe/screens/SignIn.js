@@ -34,7 +34,7 @@ export default class SignIn extends Component {
         firebase.auth().signInWithEmailAndPassword(email, password)
         .then((user) => {
             console.log(this.props);
-            this.props.isATab ? this.props.navigateHome() : this.props.navigation.goBack();
+            this.props.navigateHome();
             // If you need to do anything with the user, do it here
             // The user will be logged in automatically by the
             // `onAuthStateChanged` listener we set up in App.js earlier
@@ -114,15 +114,6 @@ export default class SignIn extends Component {
                                 color={constants.COLOR_POSITIVE}
                             />
                         </View>
-                        { this.props.isATab ? null : (
-                            <View style={styles.button}>
-                                <Button
-                                    title='Cancel'
-                                    onPress={() => this.props.navigation.goBack()}
-                                    color={constants.COLOR_NEGATIVE}
-                                />
-                            </View>
-                        )}
                     </View>
                 </View>
             </View>

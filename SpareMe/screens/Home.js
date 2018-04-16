@@ -53,11 +53,11 @@ export default class Home extends Component {
                 });
             }
             else {
+                this.props.navigation.navigate('Tabs');
                 self.setState({
                     loading: false,
                     user: null,
                 });
-                this.props.navigation.navigate('Tabs');
             }
         });
     }
@@ -123,24 +123,21 @@ export default class Home extends Component {
     }
 
     menuHandler = (value) => {
-        switch(value) {
-          case constants.SIGN_IN: //Sign In
-            this.props.navigation.navigate('SignIn');
-            break;
-          case constants.SIGN_OUT: //Sign Out
+    switch(value) {
+        case constants.SIGN_OUT: //Sign Out
             console.log('User Logged Out');
             firebase.auth().signOut();
-            this.refresh();
+            this.props.navigation.navigate('Tabs');
             break;
-          case constants.CREATE_ACCOUNT: // Create Account
-          this.props.navigation.navigate('CreateAccount');
+        case constants.SETTINGS: // Settings
+            this.props.navigation.navigate('Settings');
             break;
-          case constants.SETTINGS: // Settings
-          this.props.navigation.navigate('Settings');
+        case constants.TUTORIAL: // Tutorial
+            this.props.navigation.navigate('Tutorial');
             break;
-          default:
+        default:
             break;
-        }
+    }
     }
 
     renderError = () => {
@@ -215,7 +212,6 @@ const styles = StyleSheet.create({
     },
     menu: {
         width: '75%',
-        // height: '50%',
         right: 0,
         zIndex: 10,
         position: 'absolute'
