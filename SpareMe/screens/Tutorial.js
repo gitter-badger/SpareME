@@ -1,11 +1,11 @@
 'use strict';
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, View, ScrollView, NetInfo, TouchableOpacity } from 'react-native';
-import Connectivity from '../components/Connectivity'
+import { Dimensions, StyleSheet, Text, View, ScrollView, Image, Button } from 'react-native';
 import CustomStatusBar from '../components/CustomStatusBar'
 import * as constants from 'constants'
+import Video from 'react-native-video'
 
-export default class Tabs extends Component {
+export default class Tutorial extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -15,28 +15,13 @@ export default class Tabs extends Component {
                 height: Dimensions.get('window').height
             }
         };
-        NetInfo.isConnected.fetch().then(isConnected => {
-            this.setState({isConnected: isConnected});
-        });
-    }
-
-    componentDidMount() {
-        NetInfo.isConnected.addEventListener('connectionChange', this.onConnectivityChange);
-    }
-
-    componentWillUnmount() {
-        NetInfo.removeEventListener('connectionChange', this.onConnectivityChange);
-    }
-
-    onConnectivityChange = isConnected => {
-        if (isConnected) {
-            this.setState({isConnected: isConnected});
-        }
     }
 
     onScroll = (event) => {
         this.setState({
-            firstPage: (event.nativeEvent.contentOffset.x < this.state.layout.width/2)
+            firstPage: (event.nativeEvent.contentOffset.x < this.state.layout.width/2),
+            secondPage: (event.nativeEvent.contentOffset.x >= this.state.layout.width/2 && event.nativeEvent.contentOffset.x < 3*this.state.layout.width/2),
+            thirdPage: (event.nativeEvent.contentOffset.x >= 3*this.state.layout.width/2)
         });
     }
 
@@ -64,14 +49,23 @@ export default class Tabs extends Component {
     }
 
     render() {
-        if (!this.state.isConnected) {
-            return(
-                <Connectivity />
-            );
-        }
         return (
             <View style={styles.container} onLayout={this.onLayout}>
                 <CustomStatusBar />
+                <View style={[styles.progressContainer, {width: this.state.layout.width}]}>
+                    <Text style={styles.progressText}>{this.state.thirdPage ? ' ' : 'Swipe to Continue'}</Text>
+                    <View style={styles.iconsContainer}>
+                        <View style={styles.iconContainer} >
+                            <Image source={require('./circle.png')} style={[styles.icon, this.state.firstPage ? styles.current : null]}/>
+                        </View>
+                        <View style={styles.iconContainer} >
+                            <Image source={require('./circle.png')} style={[styles.icon, this.state.secondPage ? styles.current : null]}/>
+                        </View>
+                        <View style={styles.iconContainer} >
+                            <Image source={require('./circle.png')} style={[styles.icon, this.state.thirdPage ? styles.current : null]}/>
+                        </View>
+                    </View>
+                </View>
                 <ScrollView
                     ref='scrollView'
                     horizontal={true}
@@ -80,24 +74,43 @@ export default class Tabs extends Component {
                     onScroll={this.onScroll}
                     scrollEventThrottle={16}
                 >
-                    <View style={[styles.pageContainer, {height: this.state.layout.height, width: this.state.layout.width}]}>
-                        <Text style={styles.progressText}>{"1. Highlight and flag the content that you don't want to see."}</Text>
+                    <View style={[styles.pageContainer, {width: this.state.layout.width}]}>
+                        <Text style={styles.instructions}>{"Highlight and flag any content that you don't want to see."}</Text>
+                        <View style={styles.videoContainer}>
+                            <Video
+                                source={require('./tutorial1.mp4')}
+                                muted={false}
+                                paused={false}
+                                resizeMode='contain'
+                                repeat={true}
+                                style={{height: this.state.layout.height * constants.VIDEO_HEIGHT_MULTIPLIER, width: this.state.layout.height * constants.VIDEO_WIDTH_MULTIPLIER}}
+                            />
+                        </View>
                     </View>
-                    <View style={[styles.pageContainer, {height: this.state.layout.height, width: this.state.layout.width}]}>
-                        <Text style={styles.progressText}>2. Choose the category</Text>
-                        <TouchableOpacity
-                            onPress={this.donePressed}
-                        >
-                            <Text style={styles.progressText}>Done</Text>
-                        </TouchableOpacity>
-
+                    <View style={[styles.pageContainer, {width: this.state.layout.width}]}>
+                        <Text style={styles.instructions}>{"Tap any blurred text that you wish to see, and choose to unflag it."}</Text>
+                        <View style={styles.videoContainer}>
+                            <Video
+                                source={require('./tutorial2.mp4')}
+                                muted={false}
+                                paused={false}
+                                resizeMode='contain'
+                                repeat={true}
+                                style={{height: this.state.layout.height * constants.VIDEO_HEIGHT_MULTIPLIER, width: this.state.layout.height * constants.VIDEO_WIDTH_MULTIPLIER}}
+                            />
+                        </View>
+                    </View>
+                    <View style={[styles.pageContainer, {width: this.state.layout.width, justifyContent: 'center'}]}>
+                        <View style={styles.button}>
+                            <Button
+                                title='Done'
+                                onPress={this.donePressed}
+                                color={constants.COLOR_POSITIVE}
+                            />
+                        </View>
                     </View>
                 </ScrollView>
-                <View style={[styles.progressContainer, {width: this.state.layout.width}]}>
-                    <Text style={styles.progressText}>Swipe to Continue</Text>
-                </View>
             </View>
-
         );
     }
 }
@@ -110,22 +123,56 @@ const styles = StyleSheet.create({
     pageContainer: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-end'
     },
     progressContainer: {
-        height: 65,
         alignItems: 'center',
-        zIndex: 2,
-        position: 'absolute',
-        bottom: 10
+        padding: 20
     },
     progressText: {
         color: constants.COLOR_WHITE,
-        fontSize: constants.TEXT_SMALL
+        fontSize: constants.TEXT_MEDIUM,
+        marginBottom: 5
+    },
+    instructions: {
+        color: constants.COLOR_WHITE,
+        fontSize: constants.TEXT_MEDIUM,
+        textAlign: 'center',
+        marginHorizontal: 25,
+        marginVertical: 15
+    },
+    iconsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    iconContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 10,
+        width: 10,
+        margin: 3
     },
     icon: {
         flex: 1,
         aspectRatio: 1,
-        resizeMode: 'contain'
-    }
+        resizeMode: 'contain',
+        tintColor: constants.COLOR_DISABLED
+    },
+    current: {
+        tintColor: null
+    },
+    videoContainer: {
+        backgroundColor: constants.COLOR_WHITE,
+        paddingHorizontal: 10,
+        paddingTop: 20,
+        paddingBottom: 0,
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15
+    },
+    button: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingVertical: 10
+    },
 });

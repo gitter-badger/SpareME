@@ -20,9 +20,6 @@ export default class Home extends Component {
             loading: true,
             menu: false
         };
-        if (firebase.auth().currentUser == null) {
-          this.props.navigation.navigate('Tabs');
-        }
         NetInfo.isConnected.fetch().then(isConnected => {
             this.setState({isConnected: isConnected});
         });
@@ -56,6 +53,7 @@ export default class Home extends Component {
                 });
             }
             else {
+                this.props.navigation.navigate('Tabs');
                 self.setState({
                     loading: false,
                     user: null,

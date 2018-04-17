@@ -28,3 +28,5 @@ export const TEXT_SMALL = 14;
 export const TEXT_MEDIUM = 16;
 export const TEXT_LARGE = 24;
 export const TEXT_HEADER = 32;
+export const VIDEO_HEIGHT_MULTIPLIER = 0.70;
+export const VIDEO_WIDTH_MULTIPLIER = VIDEO_HEIGHT_MULTIPLIER * (744.0/1332.0); // Videos are 744x1332 in dimension
