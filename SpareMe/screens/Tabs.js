@@ -15,6 +15,21 @@ export default class Tabs extends Component {
                 height: Dimensions.get('window').height
             }
         };
+        NetInfo.isConnected.fetch().then(isConnected => {
+            this.setState({isConnected: isConnected});
+        });
+    }
+
+    componentDidMount() {
+        NetInfo.isConnected.addEventListener('connectionChange', this.onConnectivityChange);
+    }
+
+    componentWillUnmount() {
+        NetInfo.removeEventListener('connectionChange', this.onConnectivityChange);
+    }
+
+    onConnectivityChange = isConnected => {
+        this.setState({isConnected: isConnected});
     }
 
     navigateHome = () => {
@@ -80,7 +95,6 @@ export default class Tabs extends Component {
                     </TouchableOpacity>
                 </View>
             </View>
-
         );
     }
 }

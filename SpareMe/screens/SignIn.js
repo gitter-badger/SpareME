@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
-import { Alert, StyleSheet, Text, View, Button, TextInput, NetInfo } from 'react-native';
+import { Alert, StyleSheet, Text, View, Button, TextInput } from 'react-native';
 import FilterWebView from '../components/FilterWebView'
 import Connectivity from '../components/Connectivity'
 import firebase from 'react-native-firebase';
@@ -10,21 +10,6 @@ export default class SignIn extends Component {
     constructor(props) {
         super(props);
         this.state = {};
-        NetInfo.isConnected.fetch().then(isConnected => {
-            this.setState({isConnected: isConnected});
-        });
-    }
-
-    componentDidMount() {
-        NetInfo.isConnected.addEventListener('connectionChange', this.onConnectivityChange);
-    }
-
-    componentWillUnmount() {
-        NetInfo.removeEventListener('connectionChange', this.onConnectivityChange);
-    }
-
-    onConnectivityChange = isConnected => {
-        this.setState({isConnected: isConnected});
     }
 
     onLogin = () => {
@@ -57,11 +42,6 @@ export default class SignIn extends Component {
     }
 
     render() {
-        if (!this.state.isConnected) {
-            return(
-                <Connectivity />
-            );
-        }
         return (
             <View style={styles.container}>
                 <View style={styles.loginView}>
