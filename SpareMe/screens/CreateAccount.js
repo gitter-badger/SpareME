@@ -1,7 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
 import { Alert, StyleSheet, Text, View, Button, TextInput, NetInfo } from 'react-native';
-import CustomStatusBar from '../components/CustomStatusBar'
 import FilterWebView from '../components/FilterWebView'
 import Connectivity from '../components/Connectivity'
 import firebase from 'react-native-firebase';
@@ -68,7 +67,6 @@ export default class CreateAccount extends Component {
         }
         return (
             <View style={styles.container}>
-                <CustomStatusBar/>
                 <View style={styles.createView}>
                     <Text style={styles.createText}>
                         Create Account
@@ -130,7 +128,7 @@ const styles = StyleSheet.create({
     createView: {
         padding: 50,
         flex: 1,
-        backgroundColor: constants.COLOR_MAIN
+        backgroundColor: constants.COLOR_MAIN_TRANSPARENT
     },
     buttonContainer: {
         flex: 1,

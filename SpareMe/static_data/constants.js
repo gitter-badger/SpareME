@@ -8,6 +8,7 @@ export const HATEFUL = 'hateful';
 export const INJECTED_CLASSNAME = 'SpareMeElement';
 export const POST_MESSAGE = 'postMessage';
 export const COLOR_MAIN = BLUE;
+export const COLOR_MAIN_TRANSPARENT = COLOR_MAIN + 'dd';
 export const COLOR_SECONDARY = RED;
 export const COLOR_DISABLED = '#aaaacc';
 export const COLOR_WHITE = '#fffcf9';

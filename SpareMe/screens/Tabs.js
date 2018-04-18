@@ -51,6 +51,7 @@ export default class Tabs extends Component {
                     onScroll={this.onScroll}
                     scrollEventThrottle={16}
                 >
+                    <Image source={require('./photo.jpeg')} resizeMode='cover' style={[styles.backgroundImage, {height: this.state.layout.height, width: this.state.layout.width * 2}]}/>
                     <View style={{height: this.state.layout.height, width: this.state.layout.width}}>
                         <SignIn isATab={true} navigateHome={this.navigateHome} />
                     </View>
@@ -116,5 +117,9 @@ const styles = StyleSheet.create({
     },
     disabledText: {
         color: constants.COLOR_DISABLED
+    },
+    backgroundImage: {
+        position: 'absolute',
+        zIndex: -1
     }
 });

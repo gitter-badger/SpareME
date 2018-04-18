@@ -9,7 +9,7 @@ export default class Loading extends Component {
         return(
             <View style={styles.container}>
                 {this.props.hideBar ? null : <CustomStatusBar/>}
-                <View style={styles.activityView}>
+                <View style={[styles.activityView, this.props.hideBar ? {backgroundColor: constants.COLOR_MAIN_TRANSPARENT} : null]}>
                     <ActivityIndicator
                         animating={true}
                         color={constants.COLOR_WHITE}
