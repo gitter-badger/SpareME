@@ -1,7 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
-import { Alert, StyleSheet, Text, View, Button, TextInput, NetInfo } from 'react-native';
-import CustomStatusBar from '../components/CustomStatusBar'
+import { Dimensions, Alert, StyleSheet, Text, View, Button, TextInput, NetInfo, Image } from 'react-native';
 import FilterWebView from '../components/FilterWebView'
 import Connectivity from '../components/Connectivity'
 import firebase from 'react-native-firebase';
@@ -10,7 +9,12 @@ import * as constants from 'constants'
 export default class Settings extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            layout: {
+                width: Dimensions.get('window').width,
+                height: Dimensions.get('window').height
+            }
+        };
         NetInfo.isConnected.fetch().then(isConnected => {
             console.log(isConnected);
             this.setState({isConnected: isConnected});
@@ -52,6 +56,15 @@ export default class Settings extends Component {
         )
     }
 
+    onLayout = (event) => {
+        this.setState({
+            layout:{
+                height: event.nativeEvent.layout.height,
+                width: event.nativeEvent.layout.width,
+            }
+        });
+    }
+
     render() {
         if (!this.state.isConnected) {
             return(
@@ -59,7 +72,8 @@ export default class Settings extends Component {
             );
         }
         return (
-            <View style={styles.container}>
+            <View style={styles.container} onLayout={this.onLayout}>
+                <Image source={require('./photo.jpeg')} resizeMode='cover' style={[styles.backgroundImage, {height: this.state.layout.height, width: this.state.layout.width}]}/>
                 <View style={styles.settingsView}>
                     <Text style={styles.settingsText}>
                         Settings
@@ -94,7 +108,7 @@ const styles = StyleSheet.create({
     settingsView: {
         padding: 50,
         flex: 1,
-        backgroundColor: constants.COLOR_MAIN,
+        backgroundColor: constants.COLOR_MAIN_TRANSPARENT,
     },
     buttonContainer: {
         flex: 1,
@@ -126,5 +140,9 @@ const styles = StyleSheet.create({
         color: constants.COLOR_WHITE,
         fontSize: constants.TEXT_HEADER,
         marginBottom: 20
+    },
+    backgroundImage: {
+        position: 'absolute',
+        zIndex: -1
     }
 });
