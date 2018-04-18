@@ -1,7 +1,8 @@
 'use strict';
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, NetInfo } from 'react-native';
 import CreateAccount from './CreateAccount'
+import Connectivity from '../components/Connectivity'
 import SignIn from './SignIn'
 import * as constants from 'constants'
 
@@ -56,6 +57,9 @@ export default class Tabs extends Component {
     }
 
     render() {
+        if (!this.state.isConnected) {
+            return (<Connectivity />);
+        }
         return (
             <View style={styles.container} onLayout={this.onLayout}>
                 <ScrollView
