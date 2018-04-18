@@ -30,9 +30,7 @@ export default class Tabs extends Component {
     }
 
     onConnectivityChange = isConnected => {
-        if (isConnected) {
-            this.setState({isConnected: isConnected});
-        }
+        this.setState({isConnected: isConnected});
     }
 
     navigateHome = () => {
@@ -99,7 +97,6 @@ export default class Tabs extends Component {
                     </TouchableOpacity>
                 </View>
             </View>
-
         );
     }
 }
