@@ -6,6 +6,7 @@ import SignIn from './screens/SignIn'
 import CreateAccount from './screens/CreateAccount'
 import Settings from './screens/Settings'
 import Tabs from './screens/Tabs'
+import Tutorial from './screens/Tutorial'
 
 export default class App extends Component {
     render() {
@@ -16,19 +17,22 @@ export default class App extends Component {
 const RootStack = StackNavigator(
     {
         Home: {
-            screen: Home,
+            screen: Home
         },
         SignIn: {
-            screen: SignIn,
+            screen: SignIn
         },
         CreateAccount: {
-            screen: CreateAccount,
+            screen: CreateAccount
         },
         Settings: {
             screen: Settings,
         },
         Tabs: {
             screen: Tabs
+        },
+        Tutorial: {
+            screen: Tutorial
         }
     },
     {

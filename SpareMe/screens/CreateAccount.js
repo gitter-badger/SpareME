@@ -12,7 +12,6 @@ export default class CreateAccount extends Component {
         super(props);
         this.state = {};
         NetInfo.isConnected.fetch().then(isConnected => {
-            console.log(isConnected);
             this.setState({isConnected: isConnected});
         });
     }
@@ -33,7 +32,7 @@ export default class CreateAccount extends Component {
         const { email, password } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
         .then((user) => {
-          this.props.isATab ? this.props.navigateHome() : this.props.navigation.goBack();
+          this.props.navigateTutorial();
             // If you need to do anything with the user, do it here
             // The user will be logged in automatically by the
             // `onAuthStateChanged` listener we set up in App.js earlier
@@ -116,15 +115,6 @@ export default class CreateAccount extends Component {
                                 color={constants.COLOR_POSITIVE}
                             />
                         </View>
-                        { this.props.isATab ? null : (
-                            <View style={styles.button}>
-                                <Button
-                                    title='Cancel'
-                                    onPress={() => this.props.navigation.goBack()}
-                                    color={constants.COLOR_NEGATIVE}
-                                />
-                            </View>
-                        )}
                     </View>
                 </View>
             </View>

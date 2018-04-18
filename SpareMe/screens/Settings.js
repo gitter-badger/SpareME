@@ -36,14 +36,14 @@ export default class Settings extends Component {
           [
             {text: 'Delete', onPress: () => {
                 if (firebase.auth().currentUser == null) {
-                  this.props.navigation.navigate('SignIn');
+                  this.props.navigation.navigate('Tabs');
                 } else {
                   firebase.auth().currentUser.delete().then(function() {
                   // User deleted
                   }).catch(function(error) {
                   // An error happened.
                   });
-                  this.props.navigation.goBack();
+                  this.props.navigation.navigate('Tabs');
                 }
             }},
             {text: 'Cancel', onPress: () => console.log('cancelled')}

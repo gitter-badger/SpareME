@@ -35,8 +35,8 @@ export default class Home extends Component {
         NetInfo.isConnected.addEventListener('connectionChange', this.onConnectivityChange);
         var self = this;
         this.authSubscription = firebase.auth().onAuthStateChanged((user) => {
-            console.log(user);
             if (user) {
+                this.shouldNavigate = true;
                 console.log(user.email + ' user authenticated');
                 user.getIdToken(/* forceRefresh */ true)
                 .then(function(result) {
@@ -53,11 +53,11 @@ export default class Home extends Component {
                 });
             }
             else {
+                this.props.navigation.navigate('Tabs');
                 self.setState({
                     loading: false,
                     user: null,
                 });
-                this.props.navigation.navigate('Tabs');
             }
         });
     }
@@ -124,22 +124,18 @@ export default class Home extends Component {
 
     menuHandler = (value) => {
         switch(value) {
-          case constants.SIGN_IN: //Sign In
-            this.props.navigation.navigate('SignIn');
-            break;
-          case constants.SIGN_OUT: //Sign Out
-            console.log('User Logged Out');
-            firebase.auth().signOut();
-            this.refresh();
-            break;
-          case constants.CREATE_ACCOUNT: // Create Account
-          this.props.navigation.navigate('CreateAccount');
-            break;
-          case constants.SETTINGS: // Settings
-          this.props.navigation.navigate('Settings');
-            break;
-          default:
-            break;
+            case constants.SIGN_OUT: //Sign Out
+                this.props.navigation.navigate('Tabs');
+                firebase.auth().signOut();
+                break;
+            case constants.SETTINGS: // Settings
+                this.props.navigation.navigate('Settings');
+                break;
+            case constants.TUTORIAL: // Tutorial
+                this.props.navigation.navigate('Tutorial');
+                break;
+            default:
+                break;
         }
     }
 
@@ -215,7 +211,6 @@ const styles = StyleSheet.create({
     },
     menu: {
         width: '75%',
-        // height: '50%',
         right: 0,
         zIndex: 10,
         position: 'absolute'
