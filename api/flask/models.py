@@ -9,7 +9,7 @@ class Label(Base):
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
     uid = Column(String(256))
-    label = Column(String(256), unique=True)
+    label = Column(String(256))
 
 class LabeledText(Base):
     __tablename__ = 'labeled_text'
