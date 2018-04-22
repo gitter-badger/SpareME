@@ -1,10 +1,7 @@
 ![SpareME Logo](docs/img/logo.png)
 
-# Current Situation
+This project is a cross-platform mobile web browser with an integrated personalized micro-content filter that helps users avoid abuse, bullying, hate speech, and other harmful content online without otherwise disrupting normal use of the web.
 
-The internet can be a miserable place. The combination of pseudonymity and social media functionality seems to encourage rampant hate speech, bullying, abuse, and generally harmful content. Content platforms have proven unwilling or unable to do enough about this situation, perhaps in part because they don’t have much incentive to address it. Additionally, there are many reasonable concerns that content removal by platforms often amounts to censorship and potentially contributes to radicalization.
+The system hides individual blocks of text that match a user’s personal definition of harmful content as each page loads. The user can selectively reveal these blocks of text if they wish, which guarantees that they have ultimate control over the content they see and are able to address any false positives. The project uses machine learning based on word embeddings to perform the NLP that drives the personalized micro-content filter, which helps users to build their personalized definition of harmful content more efficiently than they could with, for example, a simple word blacklist.
 
-# Vision
-
-SpareME is a multi-platform mobile browser which incorporates a personalized content filter. The filter obscures individual blocks of text in a way that still allows them to be selectively revealed. SpareME learns over time the sort of things that the user doesn’t want to see and selectively hides only those sorts of things on pages they visit. This empowers individual users to more effectively avoid content they deem harmful, while not actually removing content from the platform or disrupting the user’s ability to access and engage with any part of the internet.
-
+The project’s goal is to reduce the impact of harmful speech while simultaneously promoting greater freedom of speech and eliminating justifications for censorship. The responsibility of curbing harmful speech online is currently entrusted to content platforms who, for a variety of reasons such as perverse incentives, will never solve the problem. This project shifts power from content platforms to individual users, who are each given the autonomy to fully personalize their own web experience.
