@@ -43,7 +43,7 @@ def add_labeled_text(uid, label_text, text):
     db_session.add(labeled_text)
     db_session.commit()
 
-def get_labeled_text(uid):
+def get_id_labeled_text(uid):
     """
     Get a dictionary of all the given user's labeled text. Training data
     (labeled text) is in the 'data' key and training targets (label ids) are in
@@ -51,8 +51,8 @@ def get_labeled_text(uid):
     """
     all_labeled_text = db_session.query(LabeledText).filter_by(uid=uid)
     data = [labeled_text.text for labeled_text in all_labeled_text]
-    targets = [labeled_text.label for labeled_text in all_labeled_text]
-    return {'data': data, 'targets': targets}
+    target_ids = [labeled_text.label for labeled_text in all_labeled_text]
+    return {'data': data, 'targets': target_ids}
 
 def get_labels(uid):
     """

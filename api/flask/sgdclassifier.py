@@ -8,7 +8,7 @@ from collections import Counter
 import dal
 
 def fit(uid):
-    labeled_text = dal.get_labeled_text(uid)
+    labeled_text = dal.get_id_labeled_text(uid)
 
     # Requires enough data for each target to be split into training, test, and
     # validation sets.
