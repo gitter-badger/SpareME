@@ -2,6 +2,10 @@
   <img src="docs/img/logo.png" alt="SpareME Logo"/>
 </p>
 
+[![Build Status](https://travis-ci.org/cjbvt/SpareME.svg?branch=master)](https://travis-ci.org/cjbvt/SpareME)
+
+# Abstract
+
 This project is a cross-platform mobile web browser with an integrated personalized micro-content filter that helps users avoid abuse, bullying, hate speech, and other harmful content online without otherwise disrupting normal use of the web.
 
 The system hides individual blocks of text that match a user’s personal definition of harmful content as each page loads. The user can selectively reveal these blocks of text if they wish, which guarantees that they have ultimate control over the content they see and are able to address any false positives. The project uses machine learning based on word embeddings to perform the NLP that drives the personalized micro-content filter, which helps users to build their personalized definition of harmful content more efficiently than they could with, for example, a simple word blacklist.
