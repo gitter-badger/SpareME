@@ -1,4 +1,6 @@
-![SpareME Logo](docs/img/logo.png)
+<p align="center">
+  <img src="docs/img/logo.png" alt="SpareME Logo"/>
+</p>
 
 This project is a cross-platform mobile web browser with an integrated personalized micro-content filter that helps users avoid abuse, bullying, hate speech, and other harmful content online without otherwise disrupting normal use of the web.
 
