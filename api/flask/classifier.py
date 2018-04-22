@@ -21,9 +21,12 @@ def fit_thread(uid):
     """
     Asynchronously spawns a subprocess which fits a new classifier.
     """
-    p = Process(target=sgdclassifier.fit, args=(uid,))
+    p = Process(target=fit_process, args=(uid,))
     p.start()
     p.join()
+
+def fit_process(uid):
+    sgdclassifier.fit(uid)
 
 def predict(uid, unlabeled_text):
     """
