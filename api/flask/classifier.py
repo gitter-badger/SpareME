@@ -4,7 +4,8 @@ import os
 import tempfile
 
 import dal
-import sgdclassifier
+import ftclassifier
+# import sgdclassifier
 
 def fit(uid):
     """
@@ -35,7 +36,8 @@ def fit_process(uid):
     # close the temporary model file descriptor as we don't need it
     os.close(fd)
 
-    sgdclassifier.fit(uid, path)
+    ftclassifier.fit(uid, path)
+    # sgdclassifier.fit(uid, path)
 
     # persist the model to the database
     with open(path, 'rb') as f:
@@ -63,7 +65,8 @@ def predict(uid, unlabeled_text):
     with open(path, 'wb') as f:
         f.write(classifier)
 
-    predictions = sgdclassifier.predict(uid, path, unlabeled_text)
+    predictions = ftclassifier.predict(uid, path, unlabeled_text)
+    # predictions = sgdclassifier.predict(uid, path, unlabeled_text)
     
     # delete the temporary model file
     os.unlink(path)

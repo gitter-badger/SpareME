@@ -54,6 +54,18 @@ def get_id_labeled_text(uid):
     target_ids = [labeled_text.label for labeled_text in all_labeled_text]
     return {'data': data, 'targets': target_ids}
 
+def get_text_labeled_text(uid):
+    """
+    Get a dictionary of all the given user's labeled text. Training data
+    (labeled text) is in the 'data' key and training targets (label texts) are in
+    the 'targets' key.
+    """
+    all_labeled_text = db_session.query(LabeledText).filter_by(uid=uid)
+    data = [labeled_text.text for labeled_text in all_labeled_text]
+    target_ids = [labeled_text.label for labeled_text in all_labeled_text]
+    targets = [get_label_text(uid, id) for id in target_ids]
+    return {'data': data, 'targets': targets}
+
 def get_labels(uid):
     """
     Get a list of all the given user's labels.
