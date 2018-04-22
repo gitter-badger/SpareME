@@ -98,7 +98,7 @@ def update_classifier(uid, model):
 
 def get_classifier(uid):
     """
-    Gets the user's classifier from the database.
+    Gets the user's binary classifier blob from the database.
     """
     classifier = db_session.query(Classifier).filter_by(uid=uid).first()
     if not classifier:

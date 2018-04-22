@@ -5,9 +5,13 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import SGDClassifier
 from collections import Counter
 
+import os
+import pickle
+import tempfile
+
 import dal
 
-def fit(uid):
+def fit(uid, path):
     labeled_text = dal.get_id_labeled_text(uid)
 
     # Requires enough data for each target to be split into training, test, and
@@ -34,5 +38,17 @@ def fit(uid):
     # train the classifier
     gs_clf.fit(labeled_text['data'], labeled_text['targets'])
 
-    # persist the classifier to the db
-    dal.update_classifier(uid, gs_clf)
+    # serialize the model out to the temporary model file
+    with open(path, "wb") as f:
+        pickle.dump(gs_clf, f)
+
+def predict(uid, path, unlabeled_text):
+    # deserialize the model in from the temporary model file
+    with open(path, "rb") as f:
+        gs_clf = pickle.load(f)
+
+    # use the model to predict the most likely label for each of the given strings
+    predicted_ids = gs_clf.predict(unlabeled_text)
+
+    # convert the predicted label ids to actual label text for each unlabeled text string
+    return [dal.get_label_text(uid, int(id)) for id in predicted_ids]

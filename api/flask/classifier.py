@@ -1,7 +1,10 @@
 from threading import Thread
 from multiprocessing import Process
-import sgdclassifier
+import os
+import tempfile
+
 import dal
+import sgdclassifier
 
 def fit(uid):
     """
@@ -26,7 +29,21 @@ def fit_thread(uid):
     p.join()
 
 def fit_process(uid):
-    sgdclassifier.fit(uid)
+    # create a new temporary model file
+    fd, path = tempfile.mkstemp()
+
+    # close the temporary model file descriptor as we don't need it
+    os.close(fd)
+
+    sgdclassifier.fit(uid, path)
+
+    # persist the model to the database
+    with open(path, 'rb') as f:
+        classifier = f.read()
+        dal.update_classifier(uid, classifier)
+
+    # delete the temporary model file
+    os.unlink(path)
 
 def predict(uid, unlabeled_text):
     """
@@ -35,5 +52,20 @@ def predict(uid, unlabeled_text):
     classifier = dal.get_classifier(uid)
     if not classifier:
         return ['harmless' for _ in unlabeled_text]
-    predicted_ids = classifier.predict(unlabeled_text)
-    return [dal.get_label_text(uid, int(id)) for id in predicted_ids]
+
+    # create a new temporary model file
+    fd, path = tempfile.mkstemp()
+
+    # close the temporary model file descriptor as we don't need it
+    os.close(fd)
+
+    # write out model to the the temporary model file
+    with open(path, 'wb') as f:
+        f.write(classifier)
+
+    predictions = sgdclassifier.predict(uid, path, unlabeled_text)
+    
+    # delete the temporary model file
+    os.unlink(path)
+
+    return predictions
