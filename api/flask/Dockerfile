@@ -32,4 +32,4 @@ HEALTHCHECK --interval=12s --timeout=12s --start-period=30s \
 
 EXPOSE 5000
 
-CMD ["uwsgi", "--http-socket", "0.0.0.0:5000", "--wsgi-file", "app.py", "--callable", "app"]
+CMD ["uwsgi", "--enable-threads", "--http-socket", "0.0.0.0:5000", "--wsgi-file", "app.py", "--callable", "app"]
