@@ -14,10 +14,10 @@ def fit(uid):
     spawn a thread whose only responsibility is spawning and joining
     the process.
     """
-    t = Thread(target=async_fit, args=(uid,))
+    t = Thread(target=fit_thread, args=(uid,))
     t.start()
 
-def async_fit(uid):
+def fit_thread(uid):
     """
     Asynchronously spawns a subprocess which fits a new classifier.
     """
