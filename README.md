@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/img/logo.png" alt="SpareME Logo"/>
+  <img src="docs/img/logo.png" alt="SpareME Logo" width=200px/>
 </p>
 
 [![Build Status](https://travis-ci.org/cjbvt/SpareME.svg?branch=master)](https://travis-ci.org/cjbvt/SpareME)
